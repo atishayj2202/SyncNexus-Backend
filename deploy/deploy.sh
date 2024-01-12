@@ -1,13 +1,13 @@
 set -e
 usage="Usage: sh deploy/staging.sh [migrate|build_push]"
 
-export PROJECT_NAME=google-solution-challenge
+export PROJECT_NAME=avinya-hackathon
 
 # docker details
-export IMAGE_NAME=google-solution-challenge-backend
+export IMAGE_NAME=avinya-hackathon-backend
 export IMAGE_VERSION=0.1.0
-export SERVICE_NAME=google-solution-challenge-server
-export REPOSITORY_NAME=google-solution-challenge-backend
+export SERVICE_NAME=avinya-hackathone-server
+export REPOSITORY_NAME=avinya-hackathon-backend
 export FULL_IMAGE_NAME=us-east4-docker.pkg.dev/${PROJECT_NAME}/${REPOSITORY_NAME}/${IMAGE_NAME}:${IMAGE_VERSION}
 export FLYWAY_CONTAINER_NAME=flyway/flyway:latest
 export FLYWAY_CONFIG_PATH="$PWD"/keys/conf
