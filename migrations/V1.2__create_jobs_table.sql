@@ -7,5 +7,7 @@ CREATE TABLE jobs (
     location GEOGRAPHY(Point),
     done TIMESTAMPTZ DEFAULT NULL,
     amount BIGINT,
-    FOREIGN KEY (employer) REFERENCES user_accounts(id)
+    FOREIGN KEY (employer) REFERENCES user_accounts(id),
+    INDEX idx_jobs_location (location),
+    INDEX idx_employer (employer)
 );
