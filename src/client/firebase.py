@@ -6,10 +6,8 @@ from uuid import UUID
 import firebase_admin
 import requests
 from firebase_admin import auth, credentials
-from firebase_admin.auth import UserRecord
 from pydantic import BaseModel
 
-from src.utils.enums import AuthType
 
 
 class FirebaseUser(BaseModel):
