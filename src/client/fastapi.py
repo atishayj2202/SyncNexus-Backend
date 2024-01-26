@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 
-app = FastAPI(title="Avinya Hackathon Backend", version="0.1.0")
+app = FastAPI(title="Google Solution Challenge Backend", version="0.1.0")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
 
