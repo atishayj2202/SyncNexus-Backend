@@ -7,3 +7,8 @@ class AuthType(Enum):
     github = "github"
     apple = "apple"
     email = "email"
+    phone = "phone"
+
+class UserType(Enum):
+    employee = "employee"
+    employer = "employer"

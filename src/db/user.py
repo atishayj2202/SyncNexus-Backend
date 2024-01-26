@@ -1,14 +1,14 @@
 from typing import Type
 
 from src.db.base import Base, DBSchemaBase
-from src.utils.enums import AuthType
+from src.utils.enums import UserType
 
 
 class User(DBSchemaBase):
     email: str
     name: str
     firebase_user_id: str
-    auth_type: AuthType
+    user_type: UserType
 
     @classmethod
     def _schema_cls(cls) -> Type[Base]:
