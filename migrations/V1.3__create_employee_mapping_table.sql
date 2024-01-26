@@ -5,7 +5,7 @@ CREATE TABLE employee_mapping
     last_modified_at TIMESTAMPTZ DEFAULT NOW(),
     employee_id      UUID NOT NULL,
     employer_id      UUID NOT NULL,
-    deleted       TIMESTAMPTZ DEFAULT NULL,
+    deleted          TIMESTAMPTZ DEFAULT NULL,
     INDEX idx_employee (employee_id),
     INDEX idx_employer (employer_id),
     FOREIGN KEY (employee_id) REFERENCES user_accounts (id),

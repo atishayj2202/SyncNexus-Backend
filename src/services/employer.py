@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from fastapi import HTTPException, status
+
 from src.client.cockroach import CockroachDBClient
 from src.db.employee_mapping import Employee_Mapping
 from src.db.task import Task
@@ -8,13 +10,28 @@ from src.responses.task import TaskCreateRequest
 
 
 class EmployerService:
-    """@classmethod
-    def __verify_employee(cls, employee_id: UUID, employer: User, cockroach_client: CockroachDBClient) -> None:
-        employee = cockroach_client.query(User.get_id(), id=employee_id,error_not_exist=False)
+    @classmethod
+    def __verify_employee(
+        cls, employee_id: UUID, employer: User, cockroach_client: CockroachDBClient
+    ) -> None:
+        employee = cockroach_client.query(
+            User.get_id, id=employee_id, error_not_exist=False
+        )
         if employee is None:
-            raise Exception("Employee not found")
-        if employee.employer_id != employer.id:
-            raise Exception("Employee not found")"""
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Employee not Found"
+            )
+        employee_mapping = cockroach_client.query(
+            Employee_Mapping.get_by_multiple_field_unique,
+            fields=["employee_id", "employer_id", "deleted"],
+            match_values=[employee_id, employer.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Employee not Under Employer",
+            )
 
     @classmethod
     def add_task(

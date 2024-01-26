@@ -110,18 +110,18 @@ class DBSchemaBase(BaseModel, ABC):
             db.add(po)
 
     @classmethod
-    def _extract_all_data(cls, db: Session, statement) -> List[DBSchemaBase]:
+    def _extract_all_data(cls, db: Session, statement) -> List[DBSchemaBase] | None:
         results = db.execute(statement).scalars().all()
         return [cls.model_validate(po, from_attributes=True) for po in results]
 
     @classmethod
-    def get_all(cls, db: Session) -> List[DBSchemaBase]:
+    def get_all(cls, db: Session) -> List[DBSchemaBase] | None:
         return cls._extract_all_data(db, select(cls._schema_cls()))
 
     @classmethod
     def get_id(
         cls, db: Session, id: UUID, error_not_exist: bool = True
-    ) -> "DBSchemaBase | None":
+    ) -> DBSchemaBase | None:
         schema_cls = cls._schema_cls()
         result = db.query(schema_cls).filter(cls._schema_cls().id == id).first()
         if result:
@@ -141,7 +141,7 @@ class DBSchemaBase(BaseModel, ABC):
     @classmethod
     def get_by_field_unique(
         cls, db: Session, field: str, match_value: Any, error_not_exist: bool = False
-    ):
+    ) -> DBSchemaBase | None:
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
@@ -158,9 +158,38 @@ class DBSchemaBase(BaseModel, ABC):
         return None
 
     @classmethod
+    def get_by_multiple_field_unique(
+        cls,
+        db: Session,
+        fields: list[str],
+        match_values: list[Any],
+        error_not_exist: bool = False,
+    ) -> DBSchemaBase | None:
+        schema_cls = cls._schema_cls()
+        temp = []
+        for i in range(min(len(fields), len(match_values))):
+            temp.append(getattr(schema_cls, fields[i]) == match_values[i])
+        result = (
+            db.query(schema_cls)
+            .filter(
+                func.and_(
+                    *(getattr(schema_cls, f) == v for f, v in zip(fields, match_values))
+                )
+            )
+            .first()
+        )
+        if result:
+            return [cls.model_validate(r, from_attributes=True) for r in result]
+        if error_not_exist:
+            raise Exception(
+                f"Could not find a record in {schema_cls.__name__} with {fields} {match_values}"
+            )
+        return None
+
+    @classmethod
     def get_by_field_multiple(
         cls, db: Session, field: str, match_value: Any, error_not_exist: bool = False
-    ):
+    ) -> list[DBSchemaBase] | None:
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
@@ -181,7 +210,7 @@ class DBSchemaBase(BaseModel, ABC):
         field: str,
         match_values: list[Any],
         error_not_exist: bool = False,
-    ):
+    ) -> DBSchemaBase | None:
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
@@ -223,7 +252,7 @@ class DBSchemaBase(BaseModel, ABC):
         match_value: Any,
         model_field: Any,
         error_not_exist: bool = False,
-    ):
+    ) -> DBSchemaBase | None:
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         model_column = cls.get_field(model_field)

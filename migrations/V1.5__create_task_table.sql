@@ -6,7 +6,7 @@ CREATE TABLE task
     employee_id      UUID    NOT NULL,
     employer_id      UUID    NOT NULL,
     heading          VARCHAR NOT NULL,
-    description             TEXT        DEFAULT NULL,
+    description      TEXT        DEFAULT NULL,
     last_date        TIMESTAMPTZ DEFAULT NULL,
     deleted          TIMESTAMPTZ DEFAULT NULL,
     completed        TIMESTAMPTZ DEFAULT NULL,

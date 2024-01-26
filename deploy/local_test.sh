@@ -47,10 +47,10 @@ then
   doppler run poetry run pytest
 elif [[ $1 = "check-format" ]]
 then
-  isort src tests -c --diff && black src tests --diff --check
+  isort src tests migrations -c --diff && black src tests migrations --diff --check
 elif [[ $1 = "format" ]]
 then
-  isort src tests && black src tests
+  isort src tests migrations && black src tests migrations
 elif [[ $1 = "build-local-env" ]]
 then
   poetry env use ~/.pyenv/versions/3.10.12/bin/python
