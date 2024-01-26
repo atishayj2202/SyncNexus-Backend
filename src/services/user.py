@@ -10,7 +10,6 @@ from src.responses.user import UserCreateRequest, UserResponse
 
 
 class UserService:
-
     @classmethod
     def fetch_user(cls, user: User) -> UserResponse:
         return UserResponse(
@@ -23,7 +22,10 @@ class UserService:
 
     @classmethod
     def create_user(
-        cls, request: UserCreateRequest, cockroach_client: CockroachDBClient, firebase_client: FirebaseClient
+        cls,
+        request: UserCreateRequest,
+        cockroach_client: CockroachDBClient,
+        firebase_client: FirebaseClient,
     ) -> None:
         user: User = User(
             email=request.email,

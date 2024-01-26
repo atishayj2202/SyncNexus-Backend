@@ -9,7 +9,6 @@ from firebase_admin import auth, credentials
 from pydantic import BaseModel
 
 
-
 class FirebaseUser(BaseModel):
     id: str
     email: str

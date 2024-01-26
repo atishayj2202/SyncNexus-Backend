@@ -9,6 +9,7 @@ class AuthType(Enum):
     email = "email"
     phone = "phone"
 
+
 class UserType(Enum):
     employee = "employee"
     employer = "employer"
