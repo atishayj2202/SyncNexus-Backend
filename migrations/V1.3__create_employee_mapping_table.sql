@@ -1,12 +1,13 @@
-CREATE TABLE employee_mapping (
-    id UUID PRIMARY KEY,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
+CREATE TABLE employee_mapping
+(
+    id               UUID PRIMARY KEY,
+    created_at       TIMESTAMPTZ DEFAULT NOW(),
     last_modified_at TIMESTAMPTZ DEFAULT NOW(),
-    employee UUID NOT NULL,
-    employer UUID NOT NULL,
-    is_deleted TIMESTAMPTZ DEFAULT NULL,
-    INDEX idx_employee (employee),
-    INDEX idx_employer (employer),
-    FOREIGN KEY (employee) REFERENCES user_accounts(id),
-    FOREIGN KEY (employer) REFERENCES user_accounts(id),
+    employee_id      UUID NOT NULL,
+    employer_id      UUID NOT NULL,
+    is_deleted       TIMESTAMPTZ DEFAULT NULL,
+    INDEX idx_employee (employee_id),
+    INDEX idx_employer (employer_id),
+    FOREIGN KEY (employee_id) REFERENCES user_accounts (id),
+    FOREIGN KEY (employer_id) REFERENCES user_accounts (id),
 );
