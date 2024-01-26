@@ -153,3 +153,4 @@ cython_debug/
 keys/*
 .idea/*
 /cockroach-data/
+.DS_Store
