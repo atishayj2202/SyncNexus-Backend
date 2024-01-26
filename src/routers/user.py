@@ -12,7 +12,7 @@ from src.services.user import UserService
 USER_PREFIX = "/user"
 user_router = APIRouter(prefix=USER_PREFIX)
 ENDPOINT_CREATE_USER = "/create-user/"  # done
-ENDPOINT_GET_USER = "/{user_id}/get-user/"  # pending
+ENDPOINT_GET_USER = "/{user_id}/get-user/"  # done
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # pending
 ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # pending
 ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # pending
