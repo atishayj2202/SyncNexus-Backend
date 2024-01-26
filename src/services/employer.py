@@ -37,6 +37,7 @@ class EmployerService:
     def add_task(
         cls, request: TaskCreateRequest, cockroach_client: CockroachDBClient, user: User
     ) -> None:
+        cls.__verify_employee(request.employee_id, user, cockroach_client)
         cockroach_client.query(
             Task.add,
             items=[

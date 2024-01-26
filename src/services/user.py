@@ -16,7 +16,7 @@ class UserService:
             id=user.id,
             name=user.name,
             email=user.email,
-            auth_type=user.auth_type,
+            user_type=user.user_type,
             created_at=user.created_at,
         )
 
@@ -30,7 +30,7 @@ class UserService:
         user: User = User(
             email=request.email,
             name=request.name,
-            auth_type=request.auth_type,
+            user_type=request.user_type,
             firebase_user_id=request.firebase_user_id,
         )
         user_firebase: UserRecord = auth.get_user(

@@ -16,4 +16,4 @@ RUN poetry install --no-root
 # copy code and resources
 COPY src /code/src
 
-CMD ["uvicorn", "src.client.fastapi:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80"]
