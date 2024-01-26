@@ -13,3 +13,9 @@ class AuthType(Enum):
 class UserType(Enum):
     employee = "employee"
     employer = "employer"
+
+
+class TaskStatus(Enum):
+    pending = "pending"
+    completed = "completed"
+    cancelled = "cancelled"
