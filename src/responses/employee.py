@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.utils.enums import EmployeeStatus
+# from src.utils.enums import EmployeeStatus
 
 class EmployeeCreateRequest(BaseModel):
     employer_id: UUID
@@ -15,5 +15,5 @@ class EmployeeCreateRequest(BaseModel):
 class EmployeeResponse(BaseModel):
     employee_id: UUID
     employer_id: UUID
-    # created_at: TIMESTAMPTZ NOW(),
-    # last_modified_at: TIMESTAMPTZ NOW()
+    created_at: str
+    last_modified_at: str | datetime.time
