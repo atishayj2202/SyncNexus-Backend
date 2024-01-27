@@ -10,7 +10,7 @@ class JobCreateRequest(BaseModel):
     title: str
     description: str | None
     location_lat: float
-    lacation_long: float
+    location_long: float
     done: str | None
     amount : int
 
