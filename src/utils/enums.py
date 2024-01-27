@@ -22,9 +22,4 @@ class TaskStatus(Enum):
 
 
 class JobStatus(Enum):
-    active: "active"
-
-
-class EmployeeStatus(Enum):
-    jobtaken: "taken"
-
+    active = "active"
