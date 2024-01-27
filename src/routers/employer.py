@@ -6,6 +6,8 @@ from src.auth import user_auth
 from src.auth.user_auth import VerifiedUser
 from src.client.cockroach import CockroachDBClient
 from src.responses.task import TaskCreateRequest
+from src.responses.employee import EmployeeCreateRequest
+from src.responses.job import JobCreateRequest
 from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employee"
@@ -23,6 +25,26 @@ async def post_add_task(
     request: TaskCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@employee_router.post(ENDPOINT_ADD_EMPLOYEE)
+async def post_add_employee(
+        request: EmployeeCreateRequest,
+        cockroach_client: CockroachDBClient = Depends(),
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@employee_router.post(ENDPOINT_ADD_JOBS)
+async def post_add_job(
+        request: JobCreateRequest,
+        cockroach_client: CockroachDBClient = Depends(),
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
     EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
