@@ -48,3 +48,9 @@ async def post_add_job(
 ):
     EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
+
+
+@employee_router.get(ENDPOINT_GET_EMPLOYEES)
+async def get_employees(
+
+):
