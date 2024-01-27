@@ -11,7 +11,7 @@ from src.services.employee import EmployeeService
 
 EMPLOYEE_PREFIX = "/employee"
 employee_router = APIRouter(prefix=EMPLOYEE_PREFIX)
-ENDPOINT_GET_TASKS = "/{employee_id}/get-tasks/"  # pending
+ENDPOINT_GET_TASKS = "/{employee_id}/get-tasks/"  # done
 ENDPOINT_GET_TASK = "/{task_id}/get-task/"  # pending
 ENDPOINT_GET_JOB_DESCRIPTION = "/{task_id}/get-job-description/"  # pending
 ENDPOINT_COMPLETE_TASK = "/{task_id}/complete-task/"  # pending
