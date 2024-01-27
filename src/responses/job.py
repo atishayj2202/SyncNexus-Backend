@@ -14,6 +14,7 @@ class JobCreateRequest(BaseModel):
     done: str | None
     amount : int
 
+
 class JobResponse(BaseModel):
     id: UUID
     created_at: datetime
