@@ -4,6 +4,8 @@ CREATE TABLE jobs
     created_at       TIMESTAMPTZ DEFAULT NOW(),
     last_modified_at TIMESTAMPTZ DEFAULT NOW(),
     employer_id      UUID NOT NULL,
+    title            VARCHAR NOT NULL,
+    description      TEXT,
     deleted          TIMESTAMPTZ DEFAULT NULL,
     location         GEOGRAPHY(Point),
     done             TIMESTAMPTZ DEFAULT NULL,

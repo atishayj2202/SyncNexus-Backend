@@ -7,13 +7,10 @@ from src.utils.enums import JobStatus
 
 class JobCreateRequest(BaseModel):
     employer_id: UUID
-    employee_id: UUID
-    heading: str
+    title: str
     description: str | None
-    last_date: str | None
     location_lat: float
-    lacation_long: float
-    done: str | None
+    location_long: float
     amount : int
 
 class JobResponse(BaseModel):
