@@ -11,3 +11,9 @@ class EmployeeCreateRequest(BaseModel):
     heading: str
     description: str | None
     last_date: str | None
+
+class EmployeeResponse(BaseModel):
+    employee_id: UUID
+    employer_id: UUID
+    # created_at: TIMESTAMPTZ NOW(),
+    # last_modified_at: TIMESTAMPTZ NOW()

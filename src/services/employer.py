@@ -9,7 +9,6 @@ from src.db.user import User
 from src.responses.task import TaskCreateRequest
 from src.responses.employee import EmployeeCreateRequest
 from src.responses.job import JobCreateRequest
-from src.
 
 
 class EmployerService:
