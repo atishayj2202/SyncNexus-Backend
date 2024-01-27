@@ -8,6 +8,24 @@ from src.utils.enums import TaskStatus
 
 class EmployeeService:
     @classmethod
+    def fetch_task(cls, task: Task) -> TaskResponse:
+        temp = TaskStatus.pending
+        if task.completed is not None:
+            temp = TaskStatus.completed
+        elif task.deleted is not None:
+            temp = TaskStatus.cancelled
+        return TaskResponse(
+            id=task.id,
+            created_at=task.created_at,
+            employee_id=task.employee_id,
+            employer_id=task.employer_id,
+            heading=task.heading,
+            description=task.description,
+            last_date=task.last_date,
+            status=temp,
+        )
+
+    @classmethod
     def fetch_tasks(
         cls,
         employee: User,
@@ -20,25 +38,9 @@ class EmployeeService:
             match_value=employee.id,
             error_not_exist=False,
         )
-        responselist = []
+        response_list = []
         for task in tasks:
             if request.start_time < task.last_date < request.end_time:
                 continue
-            temp = TaskStatus.pending
-            if task.completed is not None:
-                temp = TaskStatus.completed
-            elif task.deleted is not None:
-                temp = TaskStatus.cancelled
-            responselist.append(
-                TaskResponse(
-                    id=task.id,
-                    created_at=task.created_at,
-                    employee_id=task.employee_id,
-                    employer_id=task.employer_id,
-                    heading=task.heading,
-                    description=task.description,
-                    last_date=task.last_date,
-                    status=temp,
-                )
-            )
-        return responselist
+            response_list.append(cls.fetch_task(task))
+        return response_list
