@@ -79,7 +79,6 @@ class EmployerService:
     def add_job(
             cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient, user: User
     ) -> None:
-        cls.__verify_employee(request.employee_id, user, cockroach_client)
         cockroach_client.query(
             Employee_Mapping.add,
             items=[
@@ -100,7 +99,6 @@ class EmployerService:
     def fetch_employee(
             cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient, user: User
     ) -> None:
-        cls.__verify_employee(request.employee_id, user, cockroach_client)
         cockroach_client.query(
             Employee_Mapping.fetch,
             items=[
@@ -109,8 +107,6 @@ class EmployerService:
                     employer_id=request.employer_id,
                     heading=request.heading,
                     description=request.description,
-                    last_date=request.last_date,
-                    deleted=None,
                     completed=None,
                 )
             ],
