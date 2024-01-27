@@ -8,6 +8,7 @@ from src.client.cockroach import CockroachDBClient
 from src.responses.task import TaskCreateRequest
 from src.responses.employee import EmployeeCreateRequest
 from src.responses.job import JobCreateRequest
+from src.responses.employee import EmployeeResponse
 from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employee"
@@ -52,5 +53,8 @@ async def post_add_job(
 
 @employee_router.get(ENDPOINT_GET_EMPLOYEES)
 async def get_employees(
-
+        request: EmployeeResponse,
+        cockroach_client: CockroachDBClient = Depends(),
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
+    return Response(status_code=status.HTTP_200_OK)
