@@ -7,9 +7,9 @@ from src.db.employee_mapping import Employee_Mapping
 from src.db.job import Jobs
 from src.db.task import Task
 from src.db.user import User
-from src.responses.task import TaskCreateRequest
 from src.responses.employee import EmployeeCreateRequest
 from src.responses.job import JobCreateRequest
+from src.responses.task import TaskCreateRequest
 
 
 class EmployerService:
@@ -64,7 +64,7 @@ class EmployerService:
 
     @classmethod
     def add_employee(
-            cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient
+        cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient
     ) -> None:
         employee_mapping = cockroach_client.query(
             Employee_Mapping.get_by_multiple_field_unique,
@@ -89,7 +89,7 @@ class EmployerService:
 
     @classmethod
     def add_job(
-            cls, request: JobCreateRequest, cockroach_client: CockroachDBClient
+        cls, request: JobCreateRequest, cockroach_client: CockroachDBClient
     ) -> None:
         cockroach_client.query(
             Jobs.add,
@@ -107,7 +107,7 @@ class EmployerService:
             ],
         )
 
-    '''@classmethod
+    """@classmethod
     def fetch_employee(
             cls, cockroach_client: CockroachDBClient
     ) -> None:
@@ -118,4 +118,4 @@ class EmployerService:
                 match_values=[employee_id, employer.id, None],
                 error_not_exist=False,
             )
-        )'''
+        )"""
