@@ -61,9 +61,50 @@ class EmployerService:
     ) -> None:
         cls.__verify_employee(request.employee_id, user, cockroach_client)
         cockroach_client.query(
-            Employee.add,
+            Employee_Mapping.add,
             items=[
-                Employee(
+                Employee_Mapping(
+                    employee_id=request.employee_id,
+                    employer_id=request.employer_id,
+                    heading=request.heading,
+                    description=request.description,
+                    last_date=request.last_date,
+                    deleted=None,
+                    completed=None,
+                )
+            ],
+        )
+
+    @classmethod
+    def add_job(
+            cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient, user: User
+    ) -> None:
+        cls.__verify_employee(request.employee_id, user, cockroach_client)
+        cockroach_client.query(
+            Employee_Mapping.add,
+            items=[
+                Employee_Mapping(
+                    employer_id=request.employer_id,
+                    heading=request.heading,
+                    description=request.description,
+                    location_lat=request.location_lat,
+                    location_long=request.location_long,
+                    last_date=request.last_date,
+                    deleted=None,
+                    completed=None,
+                )
+            ],
+        )
+
+    @classmethod
+    def fetch_employee(
+            cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient, user: User
+    ) -> None:
+        cls.__verify_employee(request.employee_id, user, cockroach_client)
+        cockroach_client.query(
+            Employee_Mapping.fetch,
+            items=[
+                Employee_Mapping(
                     employee_id=request.employee_id,
                     employer_id=request.employer_id,
                     heading=request.heading,

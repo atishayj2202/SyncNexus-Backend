@@ -53,8 +53,6 @@ async def post_add_job(
 
 @employee_router.get(ENDPOINT_GET_EMPLOYEES)
 async def get_employees(
-        request: EmployeeResponse,
-        cockroach_client: CockroachDBClient = Depends(),
         verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
-    return Response(status_code=status.HTTP_200_OK)
+    return EmployerService.fetch_employee(verified_user.requesting_employee)
