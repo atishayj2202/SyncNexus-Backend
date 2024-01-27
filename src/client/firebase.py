@@ -76,5 +76,18 @@ class FirebaseClient:
     def create_user_token(self, id: str):
         return auth.create_custom_token(id, app=self.app)
 
+    def create_user(self, email: str, password: str):
+        try:
+            new_user = auth.create_user(
+                email=email,
+                email_verified=False,  # Set to True if email is verified
+                password=password,
+                disabled=False,
+                app=self.app,
+            )
+            return new_user
+        except auth.EmailAlreadyExistsError:
+            return None
+
     def delete_user(self, firebase_user_id):
         auth.delete_user(firebase_user_id, self.app)
