@@ -4,7 +4,6 @@ from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
 from src.db.employee_mapping import Employee_Mapping
-from src.db.employee_location import EmployeeLocation
 from src.db.job import Jobs
 from src.db.task import Task
 from src.db.user import User
@@ -102,7 +101,7 @@ class EmployerService:
             cls, cockroach_client: CockroachDBClient
     ) -> None:
         cockroach_client.query(
-            employee_mapping = cockroach_client.query(
+            employee_mapping=cockroach_client.query(
                 Employee_Mapping.get_by_multiple_field_unique,
                 fields=["employee_id", "employer_id", "deleted"],
                 match_values=[employee_id, employer.id, None],
