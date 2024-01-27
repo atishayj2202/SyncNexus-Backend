@@ -5,7 +5,7 @@ from starlette.responses import Response
 from src.auth import user_auth
 from src.auth.user_auth import VerifiedUser
 from src.client.cockroach import CockroachDBClient
-from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
+from src.responses.employee import EmployeeCreateRequest
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.services.employer import EmployerService
