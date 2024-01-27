@@ -13,7 +13,7 @@ from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employee"
 employee_router = APIRouter(prefix=EMPLOYER_PREFIX)
-ENDPOINT_ADD_TASK = "/add-task/"  # pending
+ENDPOINT_ADD_TASK = "/add-task/"  # done
 ENDPOINT_ADD_EMPLOYEE = "/add-employee/"  # pending
 ENDPOINT_ADD_JOBS = "/add-jobs/"  # pending
 ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # pending
