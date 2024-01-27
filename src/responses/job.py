@@ -3,7 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from src.utils.enums import JobStatus
 
 class JobCreateRequest(BaseModel):
     employer_id: UUID
@@ -24,4 +23,3 @@ class JobResponse(BaseModel):
     heading: str
     description: str | None = None
     last_date: str | None = None
-    # status:
