@@ -1,0 +1,28 @@
+databaseType = "PostgreSql"
+name = "Google Solution Challenge"
+id = "741a5137-1107-4c20-a5a2-980a37046cf8"
+
+[flywayDesktop]
+developmentEnvironment = "development"
+shadowEnvironment = "shadow"
+schemaModel = "./schema-model"
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[flyway]
+mixed = true
+outOfOrder = true
+locations = [ "filesystem:migrations" ]
+validateMigrationNaming = true
+
+  [flyway.check]
+  majorTolerance = 0
+
+[environments.air-it-cockroach]
+url = "jdbc:postgresql://air-transfer-12735.5xj.cockroachlabs.cloud:26257/Google-Solution-Challenge?sslmode=verify-full&sslrootcert=/Users/atishayjain/PycharmProjects/Google-Solution-Challenge/keys/root.crt"
+schemas = [ "public" ]
+displayName = "google-solution-cockroach"
