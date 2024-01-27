@@ -7,6 +7,9 @@ from src.db.employee_mapping import Employee_Mapping
 from src.db.task import Task
 from src.db.user import User
 from src.responses.task import TaskCreateRequest
+from src.responses.employee import EmployeeCreateRequest
+from src.responses.job import JobCreateRequest
+from src.
 
 
 class EmployerService:
@@ -42,6 +45,26 @@ class EmployerService:
             Task.add,
             items=[
                 Task(
+                    employee_id=request.employee_id,
+                    employer_id=request.employer_id,
+                    heading=request.heading,
+                    description=request.description,
+                    last_date=request.last_date,
+                    deleted=None,
+                    completed=None,
+                )
+            ],
+        )
+
+    @classmethod
+    def add_employee(
+            cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient, user: User
+    ) -> None:
+        cls.__verify_employee(request.employee_id, user, cockroach_client)
+        cockroach_client.query(
+            Employee.add,
+            items=[
+                Employee(
                     employee_id=request.employee_id,
                     employer_id=request.employer_id,
                     heading=request.heading,
