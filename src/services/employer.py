@@ -97,7 +97,7 @@ class EmployerService:
         )
 
     @classmethod
-    def fetch_employee(
+    def fetch_employees(
             cls, cockroach_client: CockroachDBClient
     ) -> None:
         cockroach_client.query(
