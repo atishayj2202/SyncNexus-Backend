@@ -12,7 +12,8 @@ class JobCreateRequest(BaseModel):
     location_lat: float
     location_long: float
     done: str | None
-    amount : int
+    amount: int
+    deleted: datetime | None = None
 
 
 class JobResponse(BaseModel):
@@ -23,4 +24,4 @@ class JobResponse(BaseModel):
     heading: str
     description: str | None = None
     last_date: str | None = None
-    status: JobStatus
+    # status:

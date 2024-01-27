@@ -37,7 +37,7 @@ async def post_add_employee(
         cockroach_client: CockroachDBClient = Depends(),
         verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
-    EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
+    EmployerService.add_employee(request, cockroach_client, verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -47,7 +47,7 @@ async def post_add_job(
         cockroach_client: CockroachDBClient = Depends(),
         verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
-    EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
+    EmployerService.add_job(request, cockroach_client, verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
 
 

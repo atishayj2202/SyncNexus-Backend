@@ -3,7 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-# from src.utils.enums import EmployeeStatus
 
 class EmployeeCreateRequest(BaseModel):
     employer_id: UUID
