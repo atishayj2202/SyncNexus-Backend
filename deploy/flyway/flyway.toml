@@ -1,4 +1,4 @@
-databaseType = "CockroachDb"
+databaseType = "PostgreSql"
 name = "Google Solution Challenge"
 id = "741a5137-1107-4c20-a5a2-980a37046cf8"
 
