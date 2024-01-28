@@ -33,3 +33,27 @@ async def get_user(
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
     return UserService.fetch_user(verified_user.requesting_user)
+
+
+@user_router.get(ENDPOINT_GET_USER_LOGS, response_model=UserResponse)
+async def get_user_logs(
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    return UserService.fetch_user_logs(verified_user.requesting_user)
+
+
+@user_router.post(ENDPOINT_ADD_RATING)
+async def post_create_rating(
+        request: UserCreateRequest,
+        cockroach_client: CockroachDBClient = Depends(),
+        firebase_client: FirebaseClient = Depends(),
+):
+    UserService.create_rating(request, cockroach_client, firebase_client)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@user_router.get(ENDPOINT_GET_RATING, response_model=UserResponse)
+async def get_user(
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    return UserService.fetch_rating(verified_user.requesting_user)

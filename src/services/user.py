@@ -58,3 +58,30 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
+
+    @classmethod
+    def fetch_user_logs(cls, user: User) -> UserResponse:
+        return UserResponse(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            user_type=user.user_type,
+            created_at=user.created_at,
+        )
+
+    @classmethod
+    def create_rating(
+            cls,
+            request: UserCreateRequest,
+            cockroach_client: CockroachDBClient,
+            firebase_client: FirebaseClient,
+    ) -> None:
+        user: User = User(
+            # rating=request.rating,
+        )
+
+    @classmethod
+    def fetch_rating(cls, user: User) -> UserResponse:
+        return UserResponse(
+
+        )

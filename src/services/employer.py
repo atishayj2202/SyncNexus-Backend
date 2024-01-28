@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
 from src.db.employee_mapping import Employee_Mapping
+from src.db.employee_location import EmployeeLocation
 from src.db.job import Jobs
 from src.db.task import Task
 from src.db.user import User
@@ -111,7 +112,7 @@ class EmployerService:
     def fetch_employee(
             cls, cockroach_client: CockroachDBClient
     ) -> None:
-        employees : List[Employee_Mapping]= cockroach_client.query(
+        employee = cockroach_client.query(
             employee_mapping=cockroach_client.query(
                 Employee_Mapping.get_by_multiple_field_unique,
                 fields=["employee_id", "employer_id", "deleted"],
@@ -119,3 +120,31 @@ class EmployerService:
                 error_not_exist=False,
             )
         )"""
+
+
+    @classmethod
+    def fetch_employees(
+            cls, cockroach_client: CockroachDBClient
+    ) -> None:
+        employees: List[Employee_Mapping] = cockroach_client.query(
+            employee_mapping=cockroach_client.query(
+                Employee_Mapping.get_by_multiple_field_unique,
+                fields=["employee_id", "employer_id", "deleted"],
+                match_values=[employee_id, employer.id, None],
+                error_not_exist=False,
+            )
+        )
+
+
+    @classmethod
+    def fetch_employee_location(
+            cls, cockroach_client: CockroachDBClient
+    ) -> None:
+        employee_location = cockroach_client.query(
+            employee_mapping=cockroach_client.query(
+                EmployeeLocation.get_by_multiple_field_unique,
+                fields=["employee_id","location_lat","location_long"],
+                match_values=[employee_id, location_lat, location_long],
+                error_not_exist=False,
+            )
+        )

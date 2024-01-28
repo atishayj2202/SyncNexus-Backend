@@ -53,7 +53,20 @@ async def post_add_job(
 
 
 @employee_router.get(ENDPOINT_GET_EMPLOYEES)
-async def get_employees(
+async def get_employee(
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
     return EmployerService.fetch_employee(verified_user.requesting_employee)
+
+
+async def get_employees(
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    return EmployerService.fetch_employees(verified_user.requesting_employee)
+
+
+@employee_router.get(ENDPOINT_GET_EMPLOYEE_LOCATION)
+async def get_employee_location(
+        verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    return EmployerService.fetch_employee_location(verified_user.requesting_employee)
