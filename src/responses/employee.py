@@ -15,5 +15,15 @@ class EmployeeCreateRequest(BaseModel):
 class EmployeeResponse(BaseModel):
     employee_id: UUID
     employer_id: UUID
-    created_at: str
-    last_modified_at: str | datetime.time
+    created_at: datetime | None
+    last_modified_at: datetime | None
+
+
+class Location(BaseModel):
+    location_lat: float
+    location_long: float
+
+
+class LocationResponse(BaseModel):
+    location: Location
+    created_at: datetime | None

@@ -8,4 +8,4 @@ CREATE TABLE employee_location
     location_long    NUMERIC NOT NULL,
     FOREIGN KEY (employee_id) REFERENCES user_accounts (id),
     INDEX idx_location_session (employee_id)
-)
+);

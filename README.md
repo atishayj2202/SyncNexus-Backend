@@ -14,9 +14,9 @@ poetry install
 1. Run a local instance of cockraoch db For Testing using:
 
 ```shell
-sh deploy/local_test.sh cr-pull  # required only first time
-sh deploy/local_test.sh cr-local-start
-sh deploy/local_test.sh cr-stop  # when testing is over
+sh deploy/local_test.sh pull  # required only first time
+sh deploy/local_test.sh local-start
+sh deploy/local_test.sh stop  # when testing is over
 ```
 
 Now the tests which require this local instance will run. They can be run individually in pycharm or using the command:
