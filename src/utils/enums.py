@@ -19,3 +19,9 @@ class TaskStatus(Enum):
     pending = "pending"
     completed = "completed"
     cancelled = "cancelled"
+
+
+class EmployeeStatus(Enum):
+    active = "active"
+    removed = "removed"
+    left = "left"

@@ -4,13 +4,13 @@ from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
 from src.db.employee_mapping import Employee_Mapping
-from src.db.employee_location import EmployeeLocation
 from src.db.job import Jobs
 from src.db.task import Task
 from src.db.user import User
-from src.responses.employee import EmployeeCreateRequest
+from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
+from src.utils.enums import EmployeeStatus
 
 
 class EmployerService:
@@ -121,30 +121,40 @@ class EmployerService:
             )
         )"""
 
-
     @classmethod
     def fetch_employees(
-            cls, cockroach_client: CockroachDBClient
-    ) -> None:
-        employees: List[Employee_Mapping] = cockroach_client.query(
-            employee_mapping=cockroach_client.query(
-                Employee_Mapping.get_by_multiple_field_unique,
-                fields=["employee_id", "employer_id", "deleted"],
-                match_values=[employee_id, employer.id, None],
-                error_not_exist=False,
-            )
+        cls, cockroach_client: CockroachDBClient, user: User
+    ) -> list[EmployeeResponse]:
+        employees: list[Employee_Mapping] = cockroach_client.query(
+            Employee_Mapping.get_by_field_multiple,
+            field="employer_id",
+            match_value=user.id,
+            error_not_exist=False,
         )
 
+        temp = {}
+        for i in employees:
+            if i.deleted is not None:
+                temp[i.id] = EmployeeStatus.active
+            else:
+                temp[i.id] = EmployeeStatus.removed
 
-    @classmethod
-    def fetch_employee_location(
-            cls, cockroach_client: CockroachDBClient
-    ) -> None:
-        employee_location = cockroach_client.query(
-            employee_mapping=cockroach_client.query(
-                EmployeeLocation.get_by_multiple_field_unique,
-                fields=["employee_id","location_lat","location_long"],
-                match_values=[employee_id, location_lat, location_long],
-                error_not_exist=False,
-            )
+        users: list[User] = cockroach_client.query(
+            User.get_by_field_value_list,
+            field="id",
+            match_values=temp.keys,
+            error_not_exist=False,
         )
+
+        employee_response = []
+        for user in users:
+            employee_response.append(
+                EmployeeResponse(
+                    employee_id=user.id,
+                    name=user.name,
+                    phone_no=user.phone_no,
+                    status=temp[user.id],
+                )
+            )
+
+        return employee_response
