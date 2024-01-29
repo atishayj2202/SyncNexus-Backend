@@ -15,7 +15,7 @@ class UserService:
         return UserResponse(
             id=user.id,
             name=user.name,
-            email=user.email,
+            phone_no=user.phone_no,
             user_type=user.user_type,
             created_at=user.created_at,
         )
@@ -28,7 +28,7 @@ class UserService:
         firebase_client: FirebaseClient,
     ) -> None:
         user: User = User(
-            email=request.email,
+            phone_no=request.phone_no,
             name=request.name,
             user_type=request.user_type,
             firebase_user_id=request.firebase_user_id,
