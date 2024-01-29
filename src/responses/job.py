@@ -21,3 +21,13 @@ class JobResponse(BaseModel):
     heading: str
     description: str | None = None
     last_date: str | None = None
+
+
+class LocationCreateRequest(BaseModel):
+    pass
+
+
+class LocationResponse(BaseModel):
+    employee_id: UUID
+    location_lat: float
+    location_long: float

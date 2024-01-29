@@ -75,9 +75,14 @@ class UserService:
         request: UserCreateRequest,
         cockroach_client: CockroachDBClient,
         firebase_client: FirebaseClient,
-    ) -> None:
-        user: User = User()
-
+        user: User
+    ) -> UserResponse:
+        return UserResponse(
+            id=user.id,
+            user_to=user.user_to,
+            user_from=user.user_from,
+            rate=user.rate
+        )
     @classmethod
     def fetch_rating(cls, user: User) -> UserResponse:
         return UserResponse()
