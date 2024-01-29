@@ -27,5 +27,6 @@ class Location(BaseModel):
 
 
 class LocationResponse(BaseModel):
+    employee_id: UUID
     location: Location
     created_at: datetime | None

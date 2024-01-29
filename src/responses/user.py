@@ -21,10 +21,5 @@ class UserCreateRequest(BaseModel):
     firebase_user_id: str
 
 class RatingRequest(BaseModel):
-    user_to: UUID
-    user_from: UUID
     rate: int
     comment: str | None = None
-
-class RatingResponse(BaseModel):
-    pass
