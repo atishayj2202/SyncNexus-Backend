@@ -1,12 +1,7 @@
 import os
-import random
-from typing import List
-from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from firebase_admin import auth
-from firebase_admin.auth import UserRecord
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
@@ -25,68 +20,85 @@ def firebase_client():
     return FirebaseClient()
 
 
-@pytest.fixture(scope="function")
-def make_random_email(cockroach_client):
-    def fn():
-        email = "abc" + str(random.randint(100, 10000)) + "@gmail.com"
-        user = cockroach_client.query(
-            User.get_by_field_unique,
-            field="phone_no",
-            match_value=email,
-        )
-        if user is not None:
-            return fn()
-        return email
-
-    return fn
-
-
 @pytest.fixture(scope="session")
 def app_test_client():
     return TestClient(app)
 
 
 @pytest.fixture(scope="session")
-def fast_api_auth_header_random_employee(
-    firebase_client, make_random_email, cockroach_client
-) -> tuple[User, dict]:
-    email = make_random_email()
-    password = "omjALeay"
-    firebase_user = firebase_client.create_user(email, password)
-    user = User(
-        id=uuid4(),
-        type=UserType.employee,
-        email=email,
-        firebase_user_id=str(firebase_user.uid),
-    )
-    cockroach_client.query(
-        User.add,
-        items=[user],
-    )
-    yield user, {
-        "Authorization": f"Bearer {firebase_client.get_user_token(firebase_user.uid)}"
-    }
-    firebase_client.delete_user(firebase_user.uid)
+def fb_test_employer_id():
+    return os.environ["FIREBASE_TEST_PHONE_1_ID"]
 
 
 @pytest.fixture(scope="session")
-def fast_api_auth_header_random_employer(
-    firebase_client, make_random_email, cockroach_client
-) -> tuple[User, dict]:
-    email = make_random_email()
-    password = "omjALeay"
-    firebase_user = firebase_client.create_user(email, password)
-    user = User(
-        id=uuid4(),
-        type=UserType.employer,
-        email=email,
-        firebase_user_id=str(firebase_user.uid),
-    )
-    cockroach_client.query(
-        User.add,
-        items=[user],
-    )
-    yield user, {
-        "Authorization": f"Bearer {firebase_client.get_user_token(firebase_user.uid)}"
+def fb_test_employer_token(firebase_client, fb_test_employer_id):
+    return firebase_client.get_user_token(uid=fb_test_employer_id)
+
+
+@pytest.fixture(scope="session")
+def fast_api_auth_header_employer(fb_test_employer_token):
+    return {"Authorization": f"Bearer {fb_test_employer_token}"}
+
+
+@pytest.fixture(scope="session")
+def fb_test_employee_id():
+    return os.environ["FIREBASE_TEST_PHONE_2_ID"]
+
+
+@pytest.fixture(scope="session")
+def fb_test_employee_phone():
+    return os.environ["FIREBASE_TEST_PHONE_2"]
+
+
+@pytest.fixture(scope="session")
+def fb_test_employer_phone():
+    return os.environ["FIREBASE_TEST_PHONE_1"]
+
+
+@pytest.fixture(scope="session")
+def fb_test_employee_token(firebase_client, fb_test_employee_id):
+    return firebase_client.get_user_token(uid=fb_test_employee_id)
+
+
+@pytest.fixture(scope="session")
+def test_employee_client(
+    fb_test_employee_id, cockroach_client, fb_test_employee_phone
+) -> User:
+    existing_users: dict[str, User] = {
+        u.firebase_user_id: u for u in cockroach_client.query(User.get_all)
     }
-    firebase_client.delete_user(firebase_user.uid)
+    if fb_test_employee_id in existing_users:
+        return existing_users[fb_test_employee_id]
+    # create new
+    user = User(
+        phone_no=fb_test_employee_phone,
+        name="test_user2",
+        user_type=UserType.employee,
+        firebase_user_id=fb_test_employee_id,
+    )
+    cockroach_client.query(User.add, items=[user])
+    return user
+
+
+def test_employer_client(
+    fb_test_employer_id, cockroach_client, fb_test_employer_phone
+) -> User:
+    existing_users: dict[str, User] = {
+        u.firebase_user_id: u for u in cockroach_client.query(User.get_all)
+    }
+    if fb_test_employer_id in existing_users:
+        return existing_users[fb_test_employer_id]
+    # create new
+    user = User(
+        phone_no=fb_test_employer_phone,
+        name="test_user2",
+        user_type=UserType.employee,
+        firebase_user_id=fb_test_employer_id,
+    )
+    cockroach_client.query(User.add, items=[user])
+    return user
+
+
+@pytest.fixture(scope="session")
+def fast_api_auth_header_employee(fb_test_employee_token):
+    return {"Authorization": f"Bearer {fb_test_employee_token}"}

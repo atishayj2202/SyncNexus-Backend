@@ -5,7 +5,7 @@ from src.utils.enums import UserType
 
 
 class User(DBSchemaBase):
-    email: str
+    phone_no: str
     name: str
     firebase_user_id: str
     user_type: UserType

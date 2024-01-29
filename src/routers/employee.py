@@ -26,7 +26,9 @@ async def get_tasks(
     employee_id: UUID,
     request: DurationRequest,
     cockroach_client: CockroachDBClient = Depends(),
-    verified_employee: VerifiedEmployee = Depends(relation.VerifiedEmployee),
+    verified_employee: VerifiedEmployee = Depends(
+        relation.verify_employer_or_employer()
+    ),
 ):
     return EmployeeService.fetch_tasks(
         verified_employee.employee, cockroach_client, request
