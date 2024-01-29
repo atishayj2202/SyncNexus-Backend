@@ -20,6 +20,7 @@ class UserCreateRequest(BaseModel):
     user_type: UserType
     firebase_user_id: str
 
+
 class RatingRequest(BaseModel):
     rate: int
     comment: str | None = None
