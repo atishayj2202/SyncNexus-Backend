@@ -35,11 +35,11 @@ async def get_user(
     return UserService.fetch_user(verified_user.requesting_user)
 
 
-'''@user_router.get(ENDPOINT_GET_USER_LOGS, response_model=UserResponse)
+"""@user_router.get(ENDPOINT_GET_USER_LOGS, response_model=UserResponse)
 async def get_user_logs(
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
-    return UserService.fetch_user_logs(verified_user.requesting_user)'''
+    return UserService.fetch_user_logs(verified_user.requesting_user)"""
 
 
 # @user_router.post(ENDPOINT_ADD_RATING)

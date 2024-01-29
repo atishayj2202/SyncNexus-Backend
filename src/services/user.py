@@ -59,7 +59,7 @@ class UserService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
 
-    '''@classmethod
+    """@classmethod
     def create_rating(
         cls,
         request: UserCreateRequest,
@@ -73,4 +73,4 @@ class UserService:
 
     @classmethod
     def fetch_rating(cls, user: User) -> UserResponse:
-        return UserResponse()'''
+        return UserResponse()"""
