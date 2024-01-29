@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 
 class JobCreateRequest(BaseModel):
-    employer_id: UUID
     title: str
     description: str | None
     location_lat: float

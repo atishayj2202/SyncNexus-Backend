@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from src.utils.enums import EmployeeStatus
+
 
 class EmployeeCreateRequest(BaseModel):
     employer_id: UUID
@@ -14,16 +16,6 @@ class EmployeeCreateRequest(BaseModel):
 
 class EmployeeResponse(BaseModel):
     employee_id: UUID
-    employer_id: UUID
-    created_at: datetime | None
-    last_modified_at: datetime | None
-
-
-class Location(BaseModel):
-    location_lat: float
-    location_long: float
-
-
-class LocationResponse(BaseModel):
-    location: Location
-    created_at: datetime | None
+    name: str
+    phone_no: str
+    status: EmployeeStatus
