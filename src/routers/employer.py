@@ -24,7 +24,7 @@ ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # pend
 async def post_add_task(
     request: TaskCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
-    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
     EmployerService.add_task(request, cockroach_client, verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
@@ -34,7 +34,7 @@ async def post_add_task(
 async def post_add_employee(
     request: EmployeeCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
-    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
     EmployerService.add_employee(
         request, cockroach_client, verified_user.requesting_user
@@ -46,7 +46,7 @@ async def post_add_employee(
 async def post_add_job(
     request: JobCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
-    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
     EmployerService.add_job(request, cockroach_client, verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
