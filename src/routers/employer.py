@@ -15,7 +15,7 @@ employee_router = APIRouter(prefix=EMPLOYER_PREFIX)
 ENDPOINT_ADD_TASK = "/add-task/"  # done
 ENDPOINT_ADD_EMPLOYEE = "/add-employee/"  # done
 ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
-ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # review
+ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done
 ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # pending
 ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # pending
 
@@ -36,9 +36,7 @@ async def post_add_employee(
     cockroach_client: CockroachDBClient = Depends(),
     verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
-    EmployerService.add_employee(
-        request, cockroach_client, verified_user.requesting_user
-    )
+    EmployerService.add_employee(request, cockroach_client)
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -54,6 +52,9 @@ async def post_add_job(
 
 @employee_router.get(ENDPOINT_GET_EMPLOYEES)
 async def get_employees(
-    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
+    cockroach_client: CockroachDBClient = Depends(),
 ):
-    return EmployerService.fetch_employees(verified_user.requesting_employee)
+    return EmployerService.fetch_employees(
+        cockroach_client=cockroach_client, user=verified_user.requesting_employee
+    )
