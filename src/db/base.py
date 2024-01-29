@@ -146,7 +146,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(getattr(schema_cls, field) == match_value)
+            .filter(func.and_(getattr(schema_cls, field) == match_value))
             .first()
         )
         if result:
@@ -164,7 +164,7 @@ class DBSchemaBase(BaseModel, ABC):
         fields: list[str],
         match_values: list[Any],
         error_not_exist: bool = False,
-    ) -> DBSchemaBase | None:
+    ) -> list[DBSchemaBase] | None:
         schema_cls = cls._schema_cls()
         temp = []
         for i in range(min(len(fields), len(match_values))):
@@ -193,7 +193,43 @@ class DBSchemaBase(BaseModel, ABC):
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
-            db.query(schema_cls).filter(getattr(schema_cls, field) == match_value).all()
+            db.query(schema_cls)
+            .filter(
+                func.and_(
+                    getattr(schema_cls, field) == match_value,
+                )
+            )
+            .all()
+        )
+        if result:
+            return [cls.model_validate(r, from_attributes=True) for r in result]
+        if error_not_exist:
+            raise Exception(
+                f"Could not find a record in {schema_cls.__name__} with {field} {match_value}"
+            )
+        return None
+
+    @classmethod
+    def get_by_time_field_multiple(
+        cls,
+        db: Session,
+        time_field: str,
+        start_time: datetime,
+        end_time: datetime,
+        field: str,
+        match_value: Any,
+        error_not_exist: bool = False,
+    ) -> list[DBSchemaBase] | None:
+        schema_cls = cls._schema_cls()
+        result = (
+            db.query(schema_cls)
+            .filter(
+                func.and_(
+                    getattr(schema_cls, field) == match_value,
+                    getattr(schema_cls, time_field).between(start_time, end_time),
+                )
+            )
+            .all()
         )
         if result:
             return [cls.model_validate(r, from_attributes=True) for r in result]
@@ -210,12 +246,12 @@ class DBSchemaBase(BaseModel, ABC):
         field: str,
         match_values: list[Any],
         error_not_exist: bool = False,
-    ) -> DBSchemaBase | None:
+    ) -> list[DBSchemaBase] | None:
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(getattr(schema_cls, field).in_(match_values))
+            .filter(func.and_(getattr(schema_cls, field).in_(match_values)))
             .all()
         )
         if result:
@@ -258,7 +294,7 @@ class DBSchemaBase(BaseModel, ABC):
         model_column = cls.get_field(model_field)
         result = (
             db.query(schema_cls)
-            .filter(getattr(schema_cls, field) == match_value)
+            .filter(func.and_(getattr(schema_cls, field) == match_value))
             .order_by(model_column.desc())
             .first()
         )
