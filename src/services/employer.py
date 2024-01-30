@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
-from src.db.employee_mapping import Employee_Mapping
-from src.db.job import Jobs
-from src.db.task import Task
-from src.db.user import User
+from src.db.tables.employee_mapping import Employee_Mapping
+from src.db.tables.job import Jobs
+from src.db.tables.task import Task
+from src.db.tables.user import User
 from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest

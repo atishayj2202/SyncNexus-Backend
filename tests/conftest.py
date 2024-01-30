@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
-from src.db.user import User
+from src.db.tables.user import User
 from src.main import app
 from src.utils.enums import UserType
 

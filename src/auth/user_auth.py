@@ -7,8 +7,8 @@ from starlette import status
 from src.auth.base import _get_requesting_user
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
-from src.db.task import Task
-from src.db.user import User
+from src.db.tables.task import Task
+from src.db.tables.user import User
 from src.utils.enums import UserType
 
 

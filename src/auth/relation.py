@@ -7,8 +7,8 @@ from starlette import status
 from src.auth.base import _get_requesting_user
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
-from src.db.employee_mapping import Employee_Mapping
-from src.db.user import User
+from src.db.tables.employee_mapping import Employee_Mapping
+from src.db.tables.user import User
 
 
 class VerifiedEmployee(BaseModel):

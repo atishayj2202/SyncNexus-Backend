@@ -3,7 +3,7 @@ from firebase_admin import auth
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
-from src.db.user import User
+from src.db.tables.user import User
 
 
 def _get_requesting_user(
