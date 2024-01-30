@@ -19,13 +19,3 @@ class EmployeeResponse(BaseModel):
     name: str
     phone_no: str
     status: EmployeeStatus
-
-
-class Location(BaseModel):
-    location_lat: float
-    location_long: float
-
-
-class LocationResponse(BaseModel):
-    location: Location
-    created_at: datetime | None

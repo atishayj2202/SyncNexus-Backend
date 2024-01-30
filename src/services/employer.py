@@ -90,13 +90,13 @@ class EmployerService:
 
     @classmethod
     def add_job(
-        cls, request: JobCreateRequest, cockroach_client: CockroachDBClient
+        cls, request: JobCreateRequest, cockroach_client: CockroachDBClient, user: User
     ) -> None:
         cockroach_client.query(
             Jobs.add,
             items=[
                 Jobs(
-                    employer_id=request.employer_id,
+                    employer_id=user.id,
                     title=request.title,
                     description=request.description,
                     location_lat=request.location_lat,
@@ -108,19 +108,6 @@ class EmployerService:
             ],
         )
 
-    """@classmethod
-    def fetch_employee(
-            cls, cockroach_client: CockroachDBClient
-    ) -> None:
-        employee = cockroach_client.query(
-            employee_mapping=cockroach_client.query(
-                Employee_Mapping.get_by_multiple_field_unique,
-                fields=["employee_id", "employer_id", "deleted"],
-                match_values=[employee_id, employer.id, None],
-                error_not_exist=False,
-            )
-        )"""
-
     @classmethod
     def fetch_employees(
         cls, cockroach_client: CockroachDBClient, user: User
@@ -131,7 +118,6 @@ class EmployerService:
             match_value=user.id,
             error_not_exist=False,
         )
-
         temp = {}
         for i in employees:
             if i.deleted is not None:
@@ -145,7 +131,6 @@ class EmployerService:
             match_values=temp.keys,
             error_not_exist=False,
         )
-
         employee_response = []
         for user in users:
             employee_response.append(
@@ -156,5 +141,4 @@ class EmployerService:
                     status=temp[user.id],
                 )
             )
-
         return employee_response

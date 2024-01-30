@@ -7,7 +7,7 @@ from src.auth import relation, user_auth
 from src.auth.relation import VerifiedEmployee
 from src.auth.user_auth import VerifiedTask
 from src.client.cockroach import CockroachDBClient
-from src.responses.time import DurationRequest
+from src.responses.util import DurationRequest
 from src.services.employee import EmployeeService
 
 EMPLOYEE_PREFIX = "/employee"
@@ -26,9 +26,7 @@ async def get_tasks(
     employee_id: UUID,
     request: DurationRequest,
     cockroach_client: CockroachDBClient = Depends(),
-    verified_employee: VerifiedEmployee = Depends(
-        relation.verify_employer_or_employer()
-    ),
+    verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
 ):
     return EmployeeService.fetch_tasks(
         verified_employee.employee, cockroach_client, request

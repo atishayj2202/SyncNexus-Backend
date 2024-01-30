@@ -2,7 +2,7 @@ from src.client.cockroach import CockroachDBClient
 from src.db.task import Task
 from src.db.user import User
 from src.responses.task import TaskResponse
-from src.responses.time import DurationRequest
+from src.responses.util import DurationRequest
 from src.utils.enums import TaskStatus
 
 
