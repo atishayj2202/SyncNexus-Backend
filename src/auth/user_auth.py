@@ -9,6 +9,7 @@ from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.task import Task
 from src.db.user import User
+from src.utils.enums import UserType
 
 
 class VerifiedUser(BaseModel):
@@ -57,3 +58,37 @@ def verify_task(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
         )
     return VerifiedTask(task=task, requesting_user=user)
+
+
+def verify_employer(
+    authorization: str = Header(...),
+    cockroach_client: CockroachDBClient = Depends(),
+    firebase_client: FirebaseClient = Depends(),
+) -> VerifiedUser:
+    user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if user.type != UserType.employer:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
+        )
+    return VerifiedUser(requesting_user=user)
+
+
+def verify_employee(
+    authorization: str = Header(...),
+    cockroach_client: CockroachDBClient = Depends(),
+    firebase_client: FirebaseClient = Depends(),
+) -> VerifiedUser:
+    user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if user.type != UserType.employee:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
+        )
+    return VerifiedUser(requesting_user=user)

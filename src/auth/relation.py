@@ -16,12 +16,17 @@ class VerifiedEmployee(BaseModel):
     employer: User | None = None
 
 
-def employee_verify_employer(
+class VerifiedEmployer(BaseModel):
+    employer: User
+    employee: User | None = None
+
+
+def verify_employee_s_employer(
     employee_id: UUID,
     authorization: str = Header(...),
     cockroach_client: CockroachDBClient = Depends(),
     firebase_client: FirebaseClient = Depends(),
-):
+) -> VerifiedEmployee:
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
@@ -45,3 +50,34 @@ def employee_verify_employer(
             detail="Employee not Under Employer",
         )
     return VerifiedEmployee(employee=employee, employer=user)
+
+
+def verify_employer_s_employee(
+    employer_id: UUID,
+    authorization: str = Header(...),
+    cockroach_client: CockroachDBClient = Depends(),
+    firebase_client: FirebaseClient = Depends(),
+) -> VerifiedEmployer:
+    user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    employer = cockroach_client.query(
+        User.get_id,
+        id=employer_id,
+    )
+    if employer is None:
+        raise HTTPException(status_code=401, detail="Employee not found")
+    if employer.id == user.id:
+        return VerifiedEmployer(employee=None, employer=employer)
+    employee_mapping = cockroach_client.query(
+        Employee_Mapping.get_by_multiple_field_unique,
+        fields=["employee_id", "employer_id", "deleted"],
+        match_values=[user.id, employer.id, None],
+        error_not_exist=False,
+    )
+    if employee_mapping is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Employee not Under Employer",
+        )
+    return VerifiedEmployer(employee=user, employer=employer)
