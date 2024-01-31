@@ -1,9 +1,14 @@
+from fastapi import HTTPException
+from starlette import status
+
 from src.client.cockroach import CockroachDBClient
+from src.db.tables.employee_mapping import Employee_Mapping
 from src.db.tables.task import Task
 from src.db.tables.user import User
 from src.responses.task import TaskResponse
 from src.responses.util import DurationRequest
-from src.utils.enums import TaskStatus
+from src.utils.enums import EmployeeStatus, TaskStatus
+from src.utils.time import get_current_time
 
 
 class EmployeeService:
@@ -44,3 +49,24 @@ class EmployeeService:
                 continue
             response_list.append(cls.fetch_task(task))
         return response_list
+
+    @classmethod
+    def leave_job(cls, cockroach_client: CockroachDBClient, user: User):
+        employee_mapping = cockroach_client.query(
+            Employee_Mapping.get_by_multiple_field_unique,
+            fields=["employee_id", "deleted"],
+            match_values=[user.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Not Employed",
+            )
+        employee_mapping.deleted = get_current_time()
+        employee_mapping.status = EmployeeStatus.left
+        cockroach_client.query(
+            Employee_Mapping.update_by_id,
+            id=employee_mapping.id,
+            new_data=employee_mapping,
+        )
