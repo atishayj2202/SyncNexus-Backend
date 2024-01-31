@@ -6,7 +6,8 @@ from starlette import status
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.tables.user import User
-from src.responses.user import UserCreateRequest, UserResponse
+from src.db.tables.ratings import Rating
+from src.responses.user import UserCreateRequest, UserResponse, RatingRequest, RatingResponse
 
 
 class UserService:
@@ -59,18 +60,34 @@ class UserService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
 
-    """@classmethod
+    @classmethod
     def create_rating(
         cls,
-        request: UserCreateRequest,
+        request: RatingRequest,
         cockroach_client: CockroachDBClient,
         firebase_client: FirebaseClient,
-        user: User,
-    ) -> UserResponse:
-        return UserResponse(
-            id=user.id, user_to=user.user_to, user_from=user.user_from, rate=user.rate
+    ) -> None:
+        user: User = User(
+            # user_to=request.,
+            # user_from=request.,
+            rate=request.rate,
+            comment=request.comment,
+            user_type=request.user_type,
+            firebase_user_id=request.firebase_user_id,
+        )
+
+        user_firebase: UserRecord = auth.get_user(
+            request.firebase_user_id, app=firebase_client.app
+        )
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="User already rated",
         )
 
     @classmethod
-    def fetch_rating(cls, user: User) -> UserResponse:
-        return UserResponse()"""
+    def fetch_rating(cls, user: User, rate: Rating) -> RatingResponse:
+        return RatingResponse(
+            id=user.id,
+            rate=rate.rate,
+            comment=rate.comment,
+        )

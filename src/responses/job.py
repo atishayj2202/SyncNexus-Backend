@@ -20,3 +20,13 @@ class JobResponse(BaseModel):
     heading: str
     description: str | None = None
     last_date: str | None = None
+
+class LocationRequest(BaseModel):
+    employer_id: UUID
+    location_lat: float
+    location_long: float
+
+class LocationResponse(BaseModel):
+    employer_id: UUID
+    location_lat: float
+    location_long: float
