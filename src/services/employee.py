@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.client.cockroach import CockroachDBClient
 from src.db.tables.employee_location import EmployeeLocation
 from fastapi import HTTPException
@@ -69,6 +71,25 @@ class EmployeeService:
             amount=job.amount,
             deleted=job.deleted
         )
+
+    @classmethod
+    def fetch_job(
+            cls,
+            cockroach_client: CockroachDBClient,
+            job_id: UUID,
+    ):
+        job = cockroach_client.query(
+            Jobs.get_id,
+            id=job_id,
+            error_not_exist=False
+        )
+        if job is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job Not Found",
+            )
+
+        return cls.fetch_job_detail(job)
 
     '''@classmethod
     def add_location(

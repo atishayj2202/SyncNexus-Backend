@@ -59,35 +59,28 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
-
+    """
     @classmethod
     def create_rating(
         cls,
         request: RatingRequest,
         cockroach_client: CockroachDBClient,
-        firebase_client: FirebaseClient,
     ) -> None:
-        user: User = User(
-            # user_to=request.,
-            # user_from=request.,
+        rate: Rating = (
             rate=request.rate,
             comment=request.comment,
             user_type=request.user_type,
-            # firebase_user_id=request.firebase_user_id,
-        )
-
-        user_firebase: UserRecord = auth.get_user(
-            request.firebase_user_id, app=firebase_client.app
         )
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
             detail="User already rated",
-        )
+        )"""
 
-    @classmethod
+    """@classmethod
     def fetch_rating(cls, user: User, rate: Rating) -> RatingResponse:
         return RatingResponse(
             id=user.id,
             rate=rate.rate,
             comment=rate.comment,
         )
+    """
