@@ -18,6 +18,7 @@ ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
 ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done
 ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # pending
 ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # pending
+ENDPOINT_SEARCH_EMPLOYEE = "/{phone_no}/search-employee/"  # done
 
 
 @employee_router.post(ENDPOINT_ADD_TASK)
@@ -58,3 +59,12 @@ async def get_employees(
     return EmployerService.fetch_employees(
         cockroach_client=cockroach_client, user=verified_user.requesting_employee
     )
+
+
+@employee_router.get(ENDPOINT_SEARCH_EMPLOYEE)
+async def get_search_employees(
+    phone_no: str,
+    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
+    cockroach_client: CockroachDBClient = Depends(),
+):
+    return EmployerService.search_employee(cockroach_client=cockroach_client, phone_no=phone_no)

@@ -10,6 +10,7 @@ from src.db.tables.user import User
 from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
+from src.responses.user import UserResponse
 from src.utils.enums import EmployeeStatus
 
 
@@ -142,3 +143,36 @@ class EmployerService:
                 )
             )
         return employee_response
+
+    @classmethod
+    def search_employee(
+        cls, cockroach_client: CockroachDBClient, phone_no: str
+    ) -> UserResponse:
+        user = cockroach_client.query(
+            User.get_by_field_unique,
+            field="phone_no",
+            match_value=phone_no,
+            error_not_exist=False,
+        )
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not Found"
+            )
+        employee_mapping = cockroach_client.query(
+            Employee_Mapping.get_by_multiple_field_unique,
+            fields=["employee_id", "deleted"],
+            match_values=[user.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is not None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Employee is Employed",
+            )
+        return UserResponse(
+            id=user.id,
+            name=user.name,
+            phone_no=user.phone_no,
+            user_type=user.user_type,
+            created_at=user.created_at,
+        )
