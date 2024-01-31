@@ -11,7 +11,6 @@ from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.responses.user import UserResponse
-from src.utils.enums import EmployeeStatus
 
 
 class EmployerService:
@@ -122,10 +121,9 @@ class EmployerService:
         temp = {}
         for i in employees:
             if i.deleted is not None:
-                temp[i.id] = EmployeeStatus.active
+                temp[i.id] = i.status
             else:
-                temp[i.id] = EmployeeStatus.removed
-
+                temp[i.id] = i.status
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",

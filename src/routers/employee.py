@@ -19,7 +19,7 @@ ENDPOINT_COMPLETE_TASK = "/{task_id}/complete-task/"  # pending
 ENDPOINT_GET_EMPLOYER = "/{employer_id}/get-employer/"  # pending
 ENDPOINT_ADD_LOCATION = "/add-location/"  # pending
 ENDPOINT_GET_JOBS = "/get-jobs/"  # pending
-ENDPOINT_LEAVE_JOB = "/leave-job/"  # pending
+ENDPOINT_LEAVE_JOB = "/leave-job/"  # done
 
 
 @employee_router.post(ENDPOINT_GET_TASKS)

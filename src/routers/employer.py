@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from starlette.responses import Response
 
@@ -38,6 +38,11 @@ async def post_add_employee(
     cockroach_client: CockroachDBClient = Depends(),
     verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
+    if verified_user.requesting_user.id == request.employee_id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You cannot add yourself as an employee",
+        )
     EmployerService.add_employee(request, cockroach_client)
     return Response(status_code=status.HTTP_200_OK)
 
