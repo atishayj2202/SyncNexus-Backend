@@ -73,7 +73,7 @@ class UserService:
             rate=request.rate,
             comment=request.comment,
             user_type=request.user_type,
-            firebase_user_id=request.firebase_user_id,
+            # firebase_user_id=request.firebase_user_id,
         )
 
         user_firebase: UserRecord = auth.get_user(
