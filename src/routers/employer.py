@@ -21,7 +21,7 @@ ENDPOINT_ADD_EMPLOYEE = "/add-employee/"  # done
 ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
 ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done
 ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # pending
-ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # pending
+ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # done
 ENDPOINT_SEARCH_EMPLOYEE = "/{phone_no}/search-employee/"  # done
 ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # pending
 
