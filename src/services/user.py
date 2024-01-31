@@ -5,9 +5,14 @@ from starlette import status
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
-from src.db.tables.user import User
 from src.db.tables.ratings import Rating
-from src.responses.user import UserCreateRequest, UserResponse, RatingRequest, RatingResponse
+from src.db.tables.user import User
+from src.responses.user import (
+    RatingRequest,
+    RatingResponse,
+    UserCreateRequest,
+    UserResponse,
+)
 
 
 class UserService:
@@ -59,6 +64,7 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
+
     """
     @classmethod
     def create_rating(
