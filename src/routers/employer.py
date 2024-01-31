@@ -1,13 +1,17 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from starlette.responses import Response
 
-from src.auth import user_auth
+from src.auth import relation, user_auth
+from src.auth.relation import VerifiedEmployee
 from src.auth.user_auth import VerifiedUser
 from src.client.cockroach import CockroachDBClient
 from src.responses.employee import EmployeeCreateRequest
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
+from src.responses.util import DurationRequest
 from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employee"
@@ -75,4 +79,18 @@ async def get_search_employees(
 ):
     return EmployerService.search_employee(
         cockroach_client=cockroach_client, phone_no=phone_no
+    )
+
+
+@employee_router.post(ENDPOINT_GET_EMPLOYEE_LOCATION)
+async def post_get_employee_location(
+    employee_id: UUID,
+    request: DurationRequest,
+    cockroach_client: CockroachDBClient = Depends(),
+    verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
+):
+    return EmployerService.fetch_location_path(
+        cockroach_client=cockroach_client,
+        user=verified_employee.employee,
+        request=request,
     )
