@@ -8,10 +8,11 @@ from src.auth import relation, user_auth
 from src.auth.relation import VerifiedEmployee
 from src.auth.user_auth import VerifiedUser
 from src.client.cockroach import CockroachDBClient
-from src.responses.employee import EmployeeCreateRequest
+from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
-from src.responses.util import DurationRequest
+from src.responses.user import UserResponse
+from src.responses.util import DurationRequest, Location
 from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employee"
@@ -61,7 +62,7 @@ async def post_add_job(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@employee_router.get(ENDPOINT_GET_EMPLOYEES)
+@employee_router.get(ENDPOINT_GET_EMPLOYEES, response_model=list[EmployeeResponse])
 async def get_employees(
     verified_user: VerifiedUser = Depends(user_auth.verify_employer),
     cockroach_client: CockroachDBClient = Depends(),
@@ -71,10 +72,13 @@ async def get_employees(
     )
 
 
-@employee_router.get(ENDPOINT_SEARCH_EMPLOYEE)
+@employee_router.get(
+    ENDPOINT_SEARCH_EMPLOYEE,
+    response_model=UserResponse,
+    dependencies=[Depends(user_auth.verify_employer)],
+)
 async def get_search_employees(
     phone_no: str,
-    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
     cockroach_client: CockroachDBClient = Depends(),
 ):
     return EmployerService.search_employee(
@@ -82,9 +86,8 @@ async def get_search_employees(
     )
 
 
-@employee_router.post(ENDPOINT_GET_EMPLOYEE_LOCATION)
+@employee_router.post(ENDPOINT_GET_EMPLOYEE_LOCATION, response_model=list[Location])
 async def post_get_employee_location(
-    employee_id: UUID,
     request: DurationRequest,
     cockroach_client: CockroachDBClient = Depends(),
     verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
