@@ -7,6 +7,7 @@ from src.auth import relation, user_auth
 from src.auth.relation import VerifiedEmployee
 from src.auth.user_auth import VerifiedTask, VerifiedUser
 from src.client.cockroach import CockroachDBClient
+from src.responses.task import TaskResponse
 from src.responses.util import DurationRequest
 from src.services.employee import EmployeeService
 
@@ -22,9 +23,8 @@ ENDPOINT_GET_JOBS = "/get-jobs/"  # pending
 ENDPOINT_LEAVE_JOB = "/leave-job/"  # done
 
 
-@employee_router.post(ENDPOINT_GET_TASKS)
+@employee_router.post(ENDPOINT_GET_TASKS, response_model=list[TaskResponse])
 async def get_tasks(
-    employee_id: UUID,
     request: DurationRequest,
     cockroach_client: CockroachDBClient = Depends(),
     verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
@@ -34,9 +34,8 @@ async def get_tasks(
     )
 
 
-@employee_router.get(ENDPOINT_GET_TASK)
+@employee_router.get(ENDPOINT_GET_TASK, response_model=TaskResponse)
 async def get_task(
-    task_id: UUID,
     verified_task: VerifiedTask = Depends(user_auth.verify_task),
 ):
     return EmployeeService.fetch_task(verified_task.task)

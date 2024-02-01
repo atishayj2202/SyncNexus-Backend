@@ -12,9 +12,4 @@ class DurationRequest(BaseModel):
 class Location(BaseModel):
     location_lat: float
     location_long: float
-
-
-class LocationResponse(BaseModel):
-    employee_id: UUID
-    location: Location
     created_at: datetime | None
