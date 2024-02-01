@@ -34,7 +34,6 @@ class Base:
 
     @classmethod
     def _parse_sql_alchemy_type(cls, annotation):
-        # if its a union type, then get the non none value
         if isinstance(annotation, types.UnionType):
             annotation = [
                 t for t in typing.get_args(annotation) if t != types.NoneType
@@ -139,6 +138,38 @@ class DBSchemaBase(BaseModel, ABC):
         return cls._cached_schema_cls
 
     @classmethod
+    def get_multiple_in_radius(
+        cls,
+        db: Session,
+        lat: float,
+        lon: float,
+        radius: float,
+        error_not_exist: bool = False,
+    ) -> List[DBSchemaBase] | None:
+        schema_cls = cls._schema_cls()
+        stmt = select(
+            [
+                cls._schema_cls(),
+                func.ST_Distance_Sphere(
+                    func.ST_MakePoint(lon, lat),
+                    func.ST_MakePoint(getattr(schema_cls, "location_long"), getattr(schema_cls, "location_lat")),
+                ).label("distance"),
+            ]
+        ).where(
+            func.ST_Distance_Sphere(
+                func.ST_MakePoint(lon, lat),
+                func.ST_MakePoint(getattr(schema_cls, "location_long"), getattr(schema_cls, "location_lat")),
+            )
+            <= radius  # Distance in meters
+        )
+        result = db.execute(stmt)
+        if result:
+            return [cls.model_validate(r, from_attributes=True) for r in result]
+        if error_not_exist:
+            raise Exception(f"Could not find a record in {schema_cls.__name__}")
+        return None
+
+    @classmethod
     def get_by_field_unique(
         cls, db: Session, field: str, match_value: Any, error_not_exist: bool = False
     ) -> DBSchemaBase | None:
@@ -166,9 +197,6 @@ class DBSchemaBase(BaseModel, ABC):
         error_not_exist: bool = False,
     ) -> list[DBSchemaBase] | None:
         schema_cls = cls._schema_cls()
-        temp = []
-        for i in range(min(len(fields), len(match_values))):
-            temp.append(getattr(schema_cls, fields[i]) == match_values[i])
         result = (
             db.query(schema_cls)
             .filter(
