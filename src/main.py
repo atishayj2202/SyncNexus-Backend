@@ -3,6 +3,8 @@ import time
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.models import Response
+from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 app = FastAPI(title="Google Solution Challenge Backend", version="0.1.0")
@@ -37,3 +39,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def error_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except HTTPException as http_exception:
+        return http_exception
+    except Exception as e:
+        return Response(
+            content="Internal Server Error",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

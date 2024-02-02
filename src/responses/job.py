@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from src.responses.util import Location
+
 
 class JobCreateRequest(BaseModel):
     title: str
@@ -16,19 +18,10 @@ class JobResponse(BaseModel):
     id: UUID
     created_at: datetime
     employer_id: UUID
-    employee_id: UUID
-    heading: str
+    title: str
     description: str | None = None
     last_date: str | None = None
-
-
-class LocationRequest(BaseModel):
-    employer_id: UUID
-    location_lat: float
-    location_long: float
-
-
-class LocationResponse(BaseModel):
-    employer_id: UUID
-    location_lat: float
-    location_long: float
+    location: Location
+    done: datetime | None = None
+    amount: int
+    deleted: datetime | None = None

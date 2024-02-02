@@ -1,8 +1,10 @@
+from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
+from src.db.tables.employee_location import EmployeeLocation
 from src.db.tables.employee_mapping import Employee_Mapping
 from src.db.tables.job import Jobs
 from src.db.tables.task import Task
@@ -11,6 +13,7 @@ from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.responses.user import UserResponse
+from src.responses.util import DurationRequest, Location
 
 
 class EmployerService:
@@ -174,3 +177,28 @@ class EmployerService:
             user_type=user.user_type,
             created_at=user.created_at,
         )
+
+    @classmethod
+    def fetch_location_path(
+        cls, cockroach_client: CockroachDBClient, user: User, request: DurationRequest
+    ) -> list[Location]:
+        locations: list[EmployeeLocation] | None = cockroach_client.query(
+            EmployeeLocation.get_by_time_field_multiple,
+            time_field="created_at",
+            start_time=request.start_time,
+            end_time=request.end_time,
+            field="employee_id",
+            match_value=user.id,
+        )
+        if locations is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No Location Found"
+            )
+        return [
+            Location(
+                location_lat=location.location_lat,
+                location_long=location.location_long,
+                created_at=location.created_at,
+            )
+            for location in locations
+        ]
