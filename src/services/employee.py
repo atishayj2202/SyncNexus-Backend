@@ -73,18 +73,19 @@ class EmployeeService:
     def add_location(
         cls,
         location: Location,
-            user: User,
+        user: User,
         cockroach_client: CockroachDBClient,
-    )-> None:
+    ) -> None:
         cockroach_client.query(
             EmployeeLocation.add,
-            items=[EmployeeLocation(
-                employee_id=user.id,
-                location_lat=location.location_lat,
-                location_long=location.location_long,
-            )]
+            items=[
+                EmployeeLocation(
+                    employee_id=user.id,
+                    location_lat=location.location_lat,
+                    location_long=location.location_long,
+                )
+            ],
         )
-
 
     def leave_job(cls, cockroach_client: CockroachDBClient, user: User):
         employee_mapping = cockroach_client.query(
@@ -125,9 +126,9 @@ class EmployeeService:
 
     @classmethod
     def complete_task(
-            cls,
-            task:Task,
-            cockroach_client: CockroachDBClient,
+        cls,
+        task: Task,
+        cockroach_client: CockroachDBClient,
     ) -> None:
         task.completed = get_current_time()
         cockroach_client.query(

@@ -104,7 +104,7 @@ class UserService:
 
     @classmethod
     def fetch_rating(
-        cls, user_id: User, cockroach_client: CockroachDBClient
+        cls, user_id: UUID, cockroach_client: CockroachDBClient
     ) -> RatingResponse:
         rate = cockroach_client.query(
             RatingView.get_id,
