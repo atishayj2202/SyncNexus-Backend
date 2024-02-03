@@ -68,16 +68,22 @@ class UserService:
     @classmethod
     def create_rating(
         cls,
+        rate: Rating,
         request: RatingRequest,
-        cockroach_client: CockroachDBClient,
-        user: User,
+        cockroach_client: CockroachDBClient
     ) -> None:
         rate: Rating(
             rate=request.rate,
             comment=request.comment
         )
 
-        if User is not None:
+        try:
+            cockroach_client.query(
+                rate.add,
+                items=[rate],
+            )
+
+        except rate:
             raise HTTPException(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 detail="User already rated",

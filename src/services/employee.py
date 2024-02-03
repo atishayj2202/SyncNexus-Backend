@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from starlette import status
 
 from src.client.cockroach import CockroachDBClient
+from src.db.tables import employee_location
 from src.db.tables.employee_location import EmployeeLocation
 from src.db.tables.employee_mapping import Employee_Mapping
 from src.db.tables.job import Jobs
@@ -74,12 +75,13 @@ class EmployeeService:
     def add_location(
         cls,
         location: employee_location,
-        cockroach_client.query()
-    ):
+        cockroach_client: CockroachDBClient,
+    )-> None:
+        location(
             employee_id=location.employee_id,
             location=Location(
             location_lat=location.location_lat,
-            location_long=location.location_long
+            location_long=location.location_long,
             created_at=location.datetime
         )
 
@@ -119,6 +121,14 @@ class EmployeeService:
             amount=job.amount,
             deleted=job.deleted,
         )
+
+    @classmethod
+    def complete_task(
+            cls,
+            task:Task,
+            user:User
+    ) -> None:
+        task.taskStatus = "completed"
 
     @classmethod
     def get_jobs(
