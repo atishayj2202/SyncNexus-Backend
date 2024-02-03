@@ -1,7 +1,10 @@
+from uuid import UUID
+
 from fastapi import HTTPException
 from starlette import status
 
 from src.client.cockroach import CockroachDBClient
+from src.db.tables.employee_location import EmployeeLocation
 from src.db.tables.employee_mapping import Employee_Mapping
 from src.db.tables.job import Jobs
 from src.db.tables.task import Task
@@ -53,6 +56,36 @@ class EmployeeService:
         return response_list
 
     @classmethod
+    def fetch_job(
+        cls,
+        cockroach_client: CockroachDBClient,
+        job_id: UUID,
+    ):
+        job = cockroach_client.query(Jobs.get_id, id=job_id, error_not_exist=False)
+        if job is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job Not Found",
+            )
+        return cls.fetch_job_detail(job)
+
+    @classmethod
+    def add_location(
+        cls,
+        location: Location,
+            user: User,
+        cockroach_client: CockroachDBClient,
+    )-> None:
+        cockroach_client.query(
+            EmployeeLocation.add,
+            items=[EmployeeLocation(
+                employee_id=user.id,
+                location_lat=location.location_lat,
+                location_long=location.location_long,
+            )]
+        )
+
+
     def leave_job(cls, cockroach_client: CockroachDBClient, user: User):
         employee_mapping = cockroach_client.query(
             Employee_Mapping.get_by_multiple_field_unique,
@@ -88,6 +121,19 @@ class EmployeeService:
             done=job.done,
             amount=job.amount,
             deleted=job.deleted,
+        )
+
+    @classmethod
+    def complete_task(
+            cls,
+            task:Task,
+            cockroach_client: CockroachDBClient,
+    ) -> None:
+        task.completed = get_current_time()
+        cockroach_client.query(
+            Task.update_by_id,
+            id=task.id,
+            new_data=task,
         )
 
     @classmethod
