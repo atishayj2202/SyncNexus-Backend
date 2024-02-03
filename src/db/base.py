@@ -152,13 +152,19 @@ class DBSchemaBase(BaseModel, ABC):
                 cls._schema_cls(),
                 func.ST_Distance_Sphere(
                     func.ST_MakePoint(lon, lat),
-                    func.ST_MakePoint(getattr(schema_cls, "location_long"), getattr(schema_cls, "location_lat")),
+                    func.ST_MakePoint(
+                        getattr(schema_cls, "location_long"),
+                        getattr(schema_cls, "location_lat"),
+                    ),
                 ).label("distance"),
             ]
         ).where(
             func.ST_Distance_Sphere(
                 func.ST_MakePoint(lon, lat),
-                func.ST_MakePoint(getattr(schema_cls, "location_long"), getattr(schema_cls, "location_lat")),
+                func.ST_MakePoint(
+                    getattr(schema_cls, "location_long"),
+                    getattr(schema_cls, "location_lat"),
+                ),
             )
             <= radius  # Distance in meters
         )

@@ -56,19 +56,6 @@ class EmployeeService:
         return response_list
 
     @classmethod
-    def fetch_job_detail(cls, job: Jobs) -> JobResponse:
-        return JobResponse(
-            employer_id=job.employer_id,
-            title=job.title,
-            description=job.description,
-            location_lat=job.location_lat,
-            location_long=job.location_long,
-            done=job.done,
-            amount=job.amount,
-            deleted=job.deleted,
-        )
-
-    @classmethod
     def fetch_job(
         cls,
         cockroach_client: CockroachDBClient,
@@ -115,3 +102,38 @@ class EmployeeService:
             id=employee_mapping.id,
             new_data=employee_mapping,
         )
+
+    @classmethod
+    def fetch_job_detail(cls, job: Jobs) -> JobResponse:
+        return JobResponse(
+            id=job.id,
+            created_at=job.created_at,
+            employer_id=job.employer_id,
+            title=job.title,
+            description=job.description,
+            location=Location(
+                location_lat=job.location_lat, location_long=job.location_long
+            ),
+            last_date=job.last_date,
+            done=job.done,
+            amount=job.amount,
+            deleted=job.deleted,
+        )
+
+    @classmethod
+    def get_jobs(
+        cls, cockroach_client: CockroachDBClient, request: Location
+    ) -> list[JobResponse]:
+        jobs: list[Jobs] | None = cockroach_client.query(
+            Jobs.get_multiple_in_radius,
+            radius=25000,
+            lat=request.location_lat,
+            lon=request.location_long,
+            error_not_exist=False,
+        )
+        if jobs is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No Jobs Found",
+            )
+        return [cls.fetch_job_detail(job=job) for job in jobs]
