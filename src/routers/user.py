@@ -58,10 +58,13 @@ async def post_create_rating(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@user_router.get(ENDPOINT_GET_RATING, response_model=RatingResponse)
+@user_router.get(
+    ENDPOINT_GET_RATING,
+    response_model=RatingResponse,
+    dependencies=[Depends(user_auth.verify_user)],
+)
 async def get_user(
     user_id: UUID,
-    verified_user: VerifiedUser = Depends(user_auth.verify_user),
     cockroach_client: CockroachDBClient = Depends(),
 ):
     return UserService.fetch_rating(user_id=user_id, cockroach_client=cockroach_client)
