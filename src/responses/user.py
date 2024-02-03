@@ -24,3 +24,9 @@ class UserCreateRequest(BaseModel):
 class RatingRequest(BaseModel):
     rate: int
     comment: str | None = None
+
+
+class RatingResponse(BaseModel):
+    rate: int
+    comment: str | None = None
+    count: int
