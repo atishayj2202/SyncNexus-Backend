@@ -22,12 +22,10 @@ class UserCreateRequest(BaseModel):
 
 
 class RatingRequest(BaseModel):
-    user_type: UserType
     rate: int
     comment: str | None = None
 
 
 class RatingResponse(BaseModel):
-    user_type: UserType
     rate: int
     comment: str | None = None

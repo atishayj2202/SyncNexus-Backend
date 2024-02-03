@@ -11,7 +11,7 @@ from src.db.tables.task import Task
 from src.db.tables.user import User
 from src.responses.job import JobResponse
 from src.responses.task import TaskResponse
-from src.responses.util import DurationRequest, Location, LocationResponse
+from src.responses.util import DurationRequest, Location
 from src.utils.enums import EmployeeStatus, TaskStatus
 from src.utils.time import get_current_time
 
@@ -83,19 +83,18 @@ class EmployeeService:
 
         return cls.fetch_job_detail(job)
 
-    """@classmethod
+    @classmethod
     def add_location(
-            cls,
-            location: employee_location,
-    ) -> LocationResponse:
-        return LocationResponse(
+        cls,
+        location: employee_location,
+        cockroach_client.query()
+    ):
             employee_id=location.employee_id,
             location=Location(
-                location_lat=location.location_lat,
-                location_long=location.location_long
-            ),
+            location_lat=location.location_lat,
+            location_long=location.location_long
             created_at=location.datetime
-        )"""
+        )
 
     def leave_job(cls, cockroach_client: CockroachDBClient, user: User):
         employee_mapping = cockroach_client.query(

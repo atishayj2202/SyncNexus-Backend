@@ -65,28 +65,28 @@ class UserService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
 
-    """
     @classmethod
     def create_rating(
         cls,
         request: RatingRequest,
         cockroach_client: CockroachDBClient,
+        user: User,
     ) -> None:
-        rate: Rating = (
+        rate: Rating(
             rate=request.rate,
-            comment=request.comment,
-            user_type=request.user_type,
+            comment=request.comment
         )
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            detail="User already rated",
-        )"""
 
-    """@classmethod
+        if User is not None:
+            raise HTTPException(
+                status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                detail="User already rated",
+            )
+
+    @classmethod
     def fetch_rating(cls, user: User, rate: Rating) -> RatingResponse:
         return RatingResponse(
             id=user.id,
             rate=rate.rate,
             comment=rate.comment,
         )
-    """
