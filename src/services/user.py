@@ -118,6 +118,5 @@ class UserService:
         else:
             return RatingResponse(
                 rate=rate.rate,
-                comment=rate.comment,
                 count=rate.count,
             )

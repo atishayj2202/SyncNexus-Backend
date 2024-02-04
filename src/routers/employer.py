@@ -16,7 +16,7 @@ from src.responses.util import DurationRequest, Location
 from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employee"
-employee_router = APIRouter(prefix=EMPLOYER_PREFIX)
+employer_router = APIRouter(prefix=EMPLOYER_PREFIX)
 ENDPOINT_ADD_TASK = "/add-task/"  # done
 ENDPOINT_ADD_EMPLOYEE = "/add-employee/"  # done
 ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
@@ -27,7 +27,7 @@ ENDPOINT_SEARCH_EMPLOYEE = "/{phone_no}/search-employee/"  # done
 ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # pending
 
 
-@employee_router.post(ENDPOINT_ADD_TASK)
+@employer_router.post(ENDPOINT_ADD_TASK)
 async def post_add_task(
     request: TaskCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
@@ -37,7 +37,7 @@ async def post_add_task(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@employee_router.post(ENDPOINT_ADD_EMPLOYEE)
+@employer_router.post(ENDPOINT_ADD_EMPLOYEE)
 async def post_add_employee(
     request: EmployeeCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
@@ -52,7 +52,7 @@ async def post_add_employee(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@employee_router.post(ENDPOINT_ADD_JOBS)
+@employer_router.post(ENDPOINT_ADD_JOBS)
 async def post_add_job(
     request: JobCreateRequest,
     cockroach_client: CockroachDBClient = Depends(),
@@ -62,7 +62,7 @@ async def post_add_job(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@employee_router.get(ENDPOINT_GET_EMPLOYEES, response_model=list[EmployeeResponse])
+@employer_router.get(ENDPOINT_GET_EMPLOYEES, response_model=list[EmployeeResponse])
 async def get_employees(
     verified_user: VerifiedUser = Depends(user_auth.verify_employer),
     cockroach_client: CockroachDBClient = Depends(),
@@ -72,7 +72,7 @@ async def get_employees(
     )
 
 
-@employee_router.get(
+@employer_router.get(
     ENDPOINT_SEARCH_EMPLOYEE,
     response_model=UserResponse,
     dependencies=[Depends(user_auth.verify_employer)],
@@ -86,7 +86,7 @@ async def get_search_employees(
     )
 
 
-@employee_router.post(ENDPOINT_GET_EMPLOYEE_LOCATION, response_model=list[Location])
+@employer_router.post(ENDPOINT_GET_EMPLOYEE_LOCATION, response_model=list[Location])
 async def post_get_employee_location(
     request: DurationRequest,
     cockroach_client: CockroachDBClient = Depends(),

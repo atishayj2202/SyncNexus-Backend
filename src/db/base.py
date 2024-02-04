@@ -56,7 +56,6 @@ class Base:
             return ARRAY(UUID)
         if issubclass(annotation, Enum):
             return SQLEnum(annotation)
-
         raise Exception(f"Type {annotation} not supported")
 
     @classmethod
