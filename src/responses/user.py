@@ -29,3 +29,4 @@ class RatingRequest(BaseModel):
 class RatingResponse(BaseModel):
     rate: int
     comment: str | None = None
+    count: int

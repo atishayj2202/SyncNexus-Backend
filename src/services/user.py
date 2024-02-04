@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import HTTPException
 from firebase_admin import auth
 from firebase_admin.auth import UserRecord
@@ -7,6 +9,7 @@ from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.tables.ratings import Rating
 from src.db.tables.user import User
+from src.db.views.rate import RatingView
 from src.responses.user import (
     RatingRequest,
     RatingResponse,
@@ -68,31 +71,53 @@ class UserService:
     @classmethod
     def create_rating(
         cls,
-        rate: Rating,
+        user_from: User,
+        user_to_id: UUID,
         request: RatingRequest,
-        cockroach_client: CockroachDBClient
+        cockroach_client: CockroachDBClient,
     ) -> None:
-        rate: Rating(
+        rate = Rating(
+            user_to=user_to_id,
+            user_from=user_from.id,
             rate=request.rate,
-            comment=request.comment
+            comment=request.comment,
         )
-
-        try:
+        temp = cockroach_client.query(
+            Rating.get_by_multiple_field_unique,
+            fields=["user_to", "user_from"],
+            match_values=[user_to_id, user_from.id],
+            error_not_exist=False,
+        )
+        if temp is not None:
+            temp.rate = request.rate
+            temp.comment = request.comment
             cockroach_client.query(
-                rate.add,
+                Rating.update_by_id,
+                id=temp.id,
+                new_data=temp,
+            )
+        else:
+            cockroach_client.query(
+                Rating.add,
                 items=[rate],
             )
 
-        except rate:
-            raise HTTPException(
-                status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                detail="User already rated",
-            )
-
     @classmethod
-    def fetch_rating(cls, user: User, rate: Rating) -> RatingResponse:
-        return RatingResponse(
-            id=user.id,
-            rate=rate.rate,
-            comment=rate.comment,
+    def fetch_rating(
+        cls, user_id: UUID, cockroach_client: CockroachDBClient
+    ) -> RatingResponse:
+        rate = cockroach_client.query(
+            RatingView.get_id,
+            id=user_id,
+            error_not_exist=False,
         )
+        if rate is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Rating not found"
+            )
+        else:
+            return RatingResponse(
+                rate=rate.rate,
+                comment=rate.comment,
+                count=rate.count,
+            )
