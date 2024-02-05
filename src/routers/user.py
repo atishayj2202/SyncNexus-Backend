@@ -19,6 +19,7 @@ from src.services.user import UserService
 USER_PREFIX = "/user"
 user_router = APIRouter(prefix=USER_PREFIX)
 ENDPOINT_CREATE_USER = "/create-user/"  # done
+ENDPOINT_CHECK_USER = "/check-user/"  # done
 ENDPOINT_GET_USER = "/{user_id}/get-user/"  # done
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # pending
 ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done
@@ -32,6 +33,14 @@ async def post_create_user(
     firebase_client: FirebaseClient = Depends(),
 ):
     UserService.create_user(request, cockroach_client, firebase_client)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@user_router.post(
+    ENDPOINT_CHECK_USER,
+    dependencies=[Depends(user_auth.verify_user)],
+)
+async def post_check_user():
     return Response(status_code=status.HTTP_200_OK)
 
 
