@@ -5,7 +5,6 @@ from src.db.base import Base, DBSchemaBase
 
 class RatingView(DBSchemaBase):
     rate: float
-    comments: dict
     count: int
 
     @classmethod
@@ -13,4 +12,4 @@ class RatingView(DBSchemaBase):
         return _RatingView
 
 
-_RatingView = Base.from_schema_base(RatingView, "user_accounts")
+_RatingView = Base.from_schema_base(RatingView, "avg_rating_with_comments")

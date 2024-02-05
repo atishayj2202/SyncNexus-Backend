@@ -7,6 +7,10 @@ from fastapi.openapi.models import Response
 from starlette import status
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
+from src.routers.employee import employee_router
+from src.routers.employer import employer_router
+from src.routers.user import user_router
+
 app = FastAPI(title="Google Solution Challenge Backend", version="0.1.0")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
@@ -52,3 +56,14 @@ async def error_middleware(request: Request, call_next):
             content="Internal Server Error",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+app.include_router(user_router)
+app.include_router(employee_router)
+app.include_router(employer_router)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("src.main:app", host="0.0.0.0", port=80, reload=True)
