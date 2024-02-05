@@ -36,11 +36,11 @@ async def post_create_user(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@user_router.post(
+@user_router.get(
     ENDPOINT_CHECK_USER,
     dependencies=[Depends(user_auth.verify_user)],
 )
-async def post_check_user():
+async def get_check_user():
     return Response(status_code=status.HTTP_200_OK)
 
 
