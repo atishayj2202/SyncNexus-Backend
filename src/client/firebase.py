@@ -92,6 +92,7 @@ class FirebaseClient:
     def delete_user(self, firebase_user_id):
         auth.delete_user(firebase_user_id, self.app)
 
+
 if __name__ == "__main__":
     client = FirebaseClient()
     print(client.get_user_token("YCDugoXMwwVeaqs2SVNDW2YhdhA2"))

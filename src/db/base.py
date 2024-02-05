@@ -182,7 +182,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(func.and_(getattr(schema_cls, field) == match_value))
+            .filter(getattr(schema_cls, field) == match_value)
             .first()
         )
         if result:
@@ -226,13 +226,7 @@ class DBSchemaBase(BaseModel, ABC):
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
-            db.query(schema_cls)
-            .filter(
-                func.and_(
-                    getattr(schema_cls, field) == match_value,
-                )
-            )
-            .all()
+            db.query(schema_cls).filter(getattr(schema_cls, field) == match_value).all()
         )
         if result:
             return [cls.model_validate(r, from_attributes=True) for r in result]
@@ -284,7 +278,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(func.and_(getattr(schema_cls, field).in_(match_values)))
+            .filter(getattr(schema_cls, field).in_(match_values))
             .all()
         )
         if result:
@@ -327,7 +321,7 @@ class DBSchemaBase(BaseModel, ABC):
         model_column = cls.get_field(model_field)
         result = (
             db.query(schema_cls)
-            .filter(func.and_(getattr(schema_cls, field) == match_value))
+            .filter(getattr(schema_cls, field) == match_value)
             .order_by(model_column.desc())
             .first()
         )
