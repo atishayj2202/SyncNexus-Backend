@@ -70,7 +70,7 @@ async def get_employees(
     cockroach_client: CockroachDBClient = Depends(),
 ):
     return EmployerService.fetch_employees(
-        cockroach_client=cockroach_client, user=verified_user.requesting_employee
+        cockroach_client=cockroach_client, user=verified_user.requesting_user
     )
 
 

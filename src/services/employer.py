@@ -130,16 +130,18 @@ class EmployerService:
         temp = {}
         for i in employees:
             if i.deleted is not None:
-                temp[i.id] = i.status
+                temp[i.employee_id] = i.status
             else:
-                temp[i.id] = i.status
+                temp[i.employee_id] = i.status
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",
-            match_values=temp.keys,
+            match_values=temp.keys(),
             error_not_exist=False,
         )
         employee_response = []
+        if users is None:
+            return employee_response
         for user in users:
             employee_response.append(
                 EmployeeResponse(
