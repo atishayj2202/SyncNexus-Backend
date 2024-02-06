@@ -130,6 +130,11 @@ class EmployeeService:
         task: Task,
         cockroach_client: CockroachDBClient,
     ) -> None:
+        if task.completed is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task Already Completed",
+            )
         task.completed = get_current_time()
         cockroach_client.query(
             Task.update_by_id,
