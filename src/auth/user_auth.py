@@ -70,7 +70,7 @@ def verify_employer(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
-    if user.type != UserType.employer:
+    if user.user_type != UserType.employer:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
         )

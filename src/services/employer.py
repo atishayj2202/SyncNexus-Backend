@@ -56,7 +56,7 @@ class EmployerService:
             items=[
                 Task(
                     employee_id=request.employee_id,
-                    employer_id=request.employer_id,
+                    employer_id=user.id,
                     heading=request.heading,
                     description=request.description,
                     last_date=request.last_date,

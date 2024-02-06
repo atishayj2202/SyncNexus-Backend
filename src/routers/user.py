@@ -21,6 +21,7 @@ user_router = APIRouter(prefix=USER_PREFIX)
 ENDPOINT_CREATE_USER = "/create-user/"  # done
 ENDPOINT_CHECK_USER = "/check-user/"  # done
 ENDPOINT_GET_USER = "/{user_id}/get-user/"  # done
+ENDPOINT_SEARCH_USER = "{email_id}/search-user/"  # pending
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # pending
 ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done
 ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done

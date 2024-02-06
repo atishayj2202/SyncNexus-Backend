@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Any, List, Optional, Type
 
 from pydantic import BaseModel, Field
-from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime
+from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime, and_
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy import Float, Integer, String, func, select
 from sqlalchemy.dialects.postgresql import UUID
@@ -205,7 +205,7 @@ class DBSchemaBase(BaseModel, ABC):
         result = (
             db.query(schema_cls)
             .filter(
-                func.and_(
+                and_(
                     *(getattr(schema_cls, f) == v for f, v in zip(fields, match_values))
                 )
             )
@@ -251,7 +251,7 @@ class DBSchemaBase(BaseModel, ABC):
         result = (
             db.query(schema_cls)
             .filter(
-                func.and_(
+                and_(
                     getattr(schema_cls, field) == match_value,
                     getattr(schema_cls, time_field).between(start_time, end_time),
                 )

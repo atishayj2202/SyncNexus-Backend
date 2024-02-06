@@ -15,7 +15,7 @@ from src.responses.user import UserResponse
 from src.responses.util import DurationRequest, Location
 from src.services.employer import EmployerService
 
-EMPLOYER_PREFIX = "/employee"
+EMPLOYER_PREFIX = "/employer"
 employer_router = APIRouter(prefix=EMPLOYER_PREFIX)
 ENDPOINT_ADD_TASK = "/add-task/"  # done
 ENDPOINT_ADD_EMPLOYEE = "/add-employee/"  # done
