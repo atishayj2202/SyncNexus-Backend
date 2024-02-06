@@ -200,7 +200,7 @@ class DBSchemaBase(BaseModel, ABC):
         fields: list[str],
         match_values: list[Any],
         error_not_exist: bool = False,
-    ) -> list[DBSchemaBase] | None:
+    ) -> DBSchemaBase | None:
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
@@ -212,7 +212,7 @@ class DBSchemaBase(BaseModel, ABC):
             .first()
         )
         if result:
-            return [cls.model_validate(r, from_attributes=True) for r in result]
+            return cls.model_validate(result, from_attributes=True)
         if error_not_exist:
             raise Exception(
                 f"Could not find a record in {schema_cls.__name__} with {fields} {match_values}"
