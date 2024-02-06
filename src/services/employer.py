@@ -9,7 +9,7 @@ from src.db.tables.employee_mapping import Employee_Mapping
 from src.db.tables.job import Jobs
 from src.db.tables.task import Task
 from src.db.tables.user import User
-from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
+from src.responses.employee import EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.responses.user import UserResponse
@@ -19,7 +19,11 @@ from src.responses.util import DurationRequest, Location
 class EmployerService:
     @classmethod
     def __verify_employee(
-        cls, employee_id: UUID, employer: User, cockroach_client: CockroachDBClient
+        cls,
+        employee_id: UUID,
+        employer: User,
+        cockroach_client: CockroachDBClient,
+        is_employer: bool = True,
     ) -> None:
         employee = cockroach_client.query(
             User.get_id, id=employee_id, error_not_exist=False
@@ -34,13 +38,12 @@ class EmployerService:
             match_values=[employee_id, employer.id, None],
             error_not_exist=False,
         )
-        if employee_mapping is None:
+        if employee_mapping is None and is_employer:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Employee not Under Employer",
             )
-
-        if employee_mapping is not None:
+        if employee_mapping is not None and not is_employer:
             raise HTTPException(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 detail="Employee is already Employed",
@@ -50,7 +53,9 @@ class EmployerService:
     def add_task(
         cls, request: TaskCreateRequest, cockroach_client: CockroachDBClient, user: User
     ) -> None:
-        cls.__verify_employee(request.employee_id, user, cockroach_client)
+        cls.__verify_employee(
+            request.employee_id, user, cockroach_client, is_employer=True
+        )
         cockroach_client.query(
             Task.add,
             items=[
@@ -68,12 +73,13 @@ class EmployerService:
 
     @classmethod
     def add_employee(
-        cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient
+        cls, employee_id: UUID, cockroach_client: CockroachDBClient, user: User
     ) -> None:
+        cls.__verify_employee(employee_id, user, cockroach_client, is_employer=False)
         employee_mapping = cockroach_client.query(
             Employee_Mapping.get_by_multiple_field_unique,
             fields=["employee_id", "deleted"],
-            match_values=[request.employee_id, None],
+            match_values=[employee_id, None],
             error_not_exist=False,
         )
         if employee_mapping is not None:
@@ -85,8 +91,8 @@ class EmployerService:
             Employee_Mapping.add,
             items=[
                 Employee_Mapping(
-                    employee_id=request.employee_id,
-                    employer_id=request.employer_id,
+                    employee_id=employee_id,
+                    employer_id=user.id,
                 )
             ],
         )

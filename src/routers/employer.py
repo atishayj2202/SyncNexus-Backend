@@ -8,7 +8,7 @@ from src.auth import relation, user_auth
 from src.auth.relation import VerifiedEmployee
 from src.auth.user_auth import VerifiedUser
 from src.client.cockroach import CockroachDBClient
-from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
+from src.responses.employee import EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.responses.user import UserResponse
@@ -18,7 +18,7 @@ from src.services.employer import EmployerService
 EMPLOYER_PREFIX = "/employer"
 employer_router = APIRouter(prefix=EMPLOYER_PREFIX)
 ENDPOINT_ADD_TASK = "/add-task/"  # done
-ENDPOINT_ADD_EMPLOYEE = "/add-employee/"  # done
+ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/"  # done
 ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
 ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done
 ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # pending
@@ -37,18 +37,20 @@ async def post_add_task(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@employer_router.post(ENDPOINT_ADD_EMPLOYEE)
-async def post_add_employee(
-    request: EmployeeCreateRequest,
+@employer_router.get(ENDPOINT_ADD_EMPLOYEE)
+async def get_add_employee(
+    employee_id: UUID,
     cockroach_client: CockroachDBClient = Depends(),
     verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
-    if verified_user.requesting_user.id == request.employee_id:
+    if verified_user.requesting_user.id == employee_id:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="You cannot add yourself as an employee",
         )
-    EmployerService.add_employee(request, cockroach_client)
+    EmployerService.add_employee(
+        employee_id, cockroach_client, verified_user.requesting_user
+    )
     return Response(status_code=status.HTTP_200_OK)
 
 

@@ -10,9 +10,9 @@ from enum import Enum
 from typing import Any, List, Optional, Type
 
 from pydantic import BaseModel, Field
-from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime, and_
+from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import Float, Integer, String, func, select
+from sqlalchemy import Float, Integer, String, and_, func, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeMeta, Session, declared_attr
@@ -182,7 +182,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(getattr(schema_cls, field) == match_value)
+            .filter(and_(getattr(schema_cls, field) == match_value))
             .first()
         )
         if result:
@@ -226,7 +226,7 @@ class DBSchemaBase(BaseModel, ABC):
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
-            db.query(schema_cls).filter(getattr(schema_cls, field) == match_value).all()
+            db.query(schema_cls).filter(and_(getattr(schema_cls, field) == match_value)).all()
         )
         if result:
             return [cls.model_validate(r, from_attributes=True) for r in result]
@@ -321,7 +321,7 @@ class DBSchemaBase(BaseModel, ABC):
         model_column = cls.get_field(model_field)
         result = (
             db.query(schema_cls)
-            .filter(getattr(schema_cls, field) == match_value)
+            .filter(and_(getattr(schema_cls, field) == match_value))
             .order_by(model_column.desc())
             .first()
         )
