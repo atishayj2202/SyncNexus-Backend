@@ -132,12 +132,13 @@ class UserService:
     ) -> list[PaymentResponse]:
         field = "to_user_id" if user.user_type == UserType.employee else "from_user_id"
         payments: list[Payment] | None = cockroach_client.query(
-            Payment.get_by_time_field_multiple(),
+            Payment.get_by_time_field_multiple,
             time_field="created_at",
             start_time=request.start_time,
             end_time=request.end_time,
             field=field,
             match_value=user.id,
+            error_not_exist=False,
         )
         if payments is None:
             raise HTTPException(
