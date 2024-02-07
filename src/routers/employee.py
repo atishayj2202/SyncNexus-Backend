@@ -49,7 +49,9 @@ async def get_leave_job(
     verified_user: VerifiedUser = Depends(user_auth.verify_employee),
     cockroach_client: CockroachDBClient = Depends(),
 ):
-    EmployeeService.leave_job(cockroach_client=cockroach_client, user=verified_user.requesting_user)
+    EmployeeService.leave_job(
+        cockroach_client=cockroach_client, user=verified_user.requesting_user
+    )
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -106,5 +108,9 @@ async def get_approve_payment(
     verified_user: VerifiedUser = Depends(user_auth.verify_employee),
     cockroach_client: CockroachDBClient = Depends(),
 ):
-    EmployeeService.approve_payment(payment_id=payment_id, user=verified_user.requesting_user, cockroach_client=cockroach_client)
+    EmployeeService.approve_payment(
+        payment_id=payment_id,
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+    )
     return Response(status_code=status.HTTP_200_OK)

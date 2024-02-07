@@ -166,10 +166,10 @@ class EmployeeService:
     def approve_payment(
         cls,
         payment_id: UUID,
-            user: User,
-            cockroach_client: CockroachDBClient,
+        user: User,
+        cockroach_client: CockroachDBClient,
     ) -> None:
-        payment :Payment= cockroach_client.query(
+        payment: Payment = cockroach_client.query(
             Payment.get_id,
             id=payment_id,
             error_not_exist=False,
