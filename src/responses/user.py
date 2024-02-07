@@ -30,3 +30,20 @@ class RatingResponse(BaseModel):
     rate: int
     comment: str | None = None
     count: int
+
+
+class PaymentRequest(BaseModel):
+    amount: int
+    to_user_id: UUID
+    currency: str = "INR"
+    remarks: str | None = None
+
+
+class PaymentResponse(BaseModel):
+    id: UUID
+    amount: int
+    from_user_id: UUID
+    to_user_id: UUID
+    currency: str = "INR"
+    remarks: str | None = None
+    created_at: datetime
