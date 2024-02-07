@@ -226,7 +226,9 @@ class DBSchemaBase(BaseModel, ABC):
         """generic function to extract a single record which matches given column and value condition"""
         schema_cls = cls._schema_cls()
         result = (
-            db.query(schema_cls).filter(and_(getattr(schema_cls, field) == match_value)).all()
+            db.query(schema_cls)
+            .filter(and_(getattr(schema_cls, field) == match_value))
+            .all()
         )
         if result:
             return [cls.model_validate(r, from_attributes=True) for r in result]

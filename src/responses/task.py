@@ -9,8 +9,8 @@ from src.utils.enums import TaskStatus
 class TaskCreateRequest(BaseModel):
     employee_id: UUID
     heading: str
-    description: str | None
-    last_date: datetime | None
+    description: str | None = None
+    last_date: datetime | None = None
 
 
 class TaskResponse(BaseModel):
