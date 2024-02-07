@@ -7,12 +7,13 @@ from src.client.cockroach import CockroachDBClient
 from src.db.tables.employee_location import EmployeeLocation
 from src.db.tables.employee_mapping import Employee_Mapping
 from src.db.tables.job import Jobs
+from src.db.tables.payment import Payment
 from src.db.tables.task import Task
 from src.db.tables.user import User
 from src.responses.employee import EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
-from src.responses.user import UserResponse
+from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
 
 
@@ -197,6 +198,7 @@ class EmployerService:
             end_time=request.end_time,
             field="employee_id",
             match_value=user.id,
+            error_not_exist=False,
         )
         if locations is None:
             raise HTTPException(
@@ -209,4 +211,48 @@ class EmployerService:
                 created_at=location.created_at,
             )
             for location in locations
+        ]
+
+    @classmethod
+    def add_payment(
+        cls, user: User, request: PaymentRequest, cockroach_client: CockroachDBClient
+    ) -> None:
+        cockroach_client.query(
+            Payment.add,
+            items=[
+                Payment(
+                    amount=request.amount,
+                    from_user_id=user.id,
+                    to_user_id=request.to_user_id,
+                    currency=request.currency,
+                    remarks=request.remarks,
+                )
+            ],
+        )
+
+    @classmethod
+    def fetch_employee_payments(
+        cls, cockroach_client: CockroachDBClient, user: User, user_id: UUID
+    ) -> list[PaymentResponse]:
+        payments: list[Payment] | None = cockroach_client.query(
+            Payment.get_by_multiple_field_unique,
+            fields=["from_user_id", "to_user_id"],
+            match_values=[user.id, user_id],
+            error_not_exist=False,
+        )
+        if payments is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No Payments Found"
+            )
+        return [
+            PaymentResponse(
+                id=payment.id,
+                amount=payment.amount,
+                created_at=payment.created_at,
+                from_user_id=payment.from_user_id,
+                to_user_id=payment.to_user_id,
+                currency=payment.currency,
+                remarks=payment.remarks,
+            )
+            for payment in payments
         ]
