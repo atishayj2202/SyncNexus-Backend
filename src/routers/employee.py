@@ -23,6 +23,7 @@ ENDPOINT_GET_EMPLOYER = "/{employer_id}/get-employer/"  # pending
 ENDPOINT_ADD_LOCATION = "/add-location/"  # done
 ENDPOINT_GET_JOBS = "/get-jobs/"  # done
 ENDPOINT_LEAVE_JOB = "/leave-job/"  # done
+ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # pending
 
 
 @employee_router.post(ENDPOINT_GET_TASKS, response_model=list[TaskResponse])
@@ -48,7 +49,7 @@ async def get_leave_job(
     verified_user: VerifiedUser = Depends(user_auth.verify_employee),
     cockroach_client: CockroachDBClient = Depends(),
 ):
-    EmployeeService.leave_job(cockroach_client, verified_user.requesting_user)
+    EmployeeService.leave_job(cockroach_client=cockroach_client, user=verified_user.requesting_user)
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -97,3 +98,13 @@ async def get_job_detail(
     cockroach_client: CockroachDBClient = Depends(),
 ):
     return EmployeeService.fetch_job(cockroach_client=cockroach_client, job_id=job_id)
+
+
+@employee_router.get(ENDPOINT_APPROVE_PAYMENT)
+async def get_approve_payment(
+    payment_id: UUID,
+    verified_user: VerifiedUser = Depends(user_auth.verify_employee),
+    cockroach_client: CockroachDBClient = Depends(),
+):
+    EmployeeService.approve_payment(payment_id=payment_id, user=verified_user.requesting_user, cockroach_client=cockroach_client)
+    return Response(status_code=status.HTTP_200_OK)
