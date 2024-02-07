@@ -7,15 +7,20 @@ from starlette import status
 
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
+from src.db.tables.Feedback import Feedback
+from src.db.tables.payment import Payment
 from src.db.tables.ratings import Rating
 from src.db.tables.user import User
 from src.db.views.rate import RatingView
 from src.responses.user import (
+    PaymentResponse,
     RatingRequest,
     RatingResponse,
     UserCreateRequest,
     UserResponse,
 )
+from src.responses.util import DurationRequest
+from src.utils.enums import UserType
 
 
 class UserService:
@@ -120,3 +125,46 @@ class UserService:
                 rate=rate.rate,
                 count=rate.count,
             )
+
+    @classmethod
+    def get_payments(
+        cls, user: User, cockroach_client: CockroachDBClient, request: DurationRequest
+    ) -> list[PaymentResponse]:
+        field = "to_user_id" if user.user_type == UserType.employee else "from_user_id"
+        payments: list[Payment] | None = cockroach_client.query(
+            Payment.get_by_time_field_multiple(),
+            time_field="created_at",
+            start_time=request.start_time,
+            end_time=request.end_time,
+            field=field,
+            match_value=user.id,
+        )
+        if payments is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No Payments Found"
+            )
+        return [
+            PaymentResponse(
+                id=payment.id,
+                amount=payment.amount,
+                created_at=payment.created_at,
+                from_user_id=payment.from_user_id,
+                to_user_id=payment.to_user_id,
+                currency=payment.currency,
+                remarks=payment.remarks,
+            )
+            for payment in payments
+        ]
+
+    @classmethod
+    def add_feedback(
+        cls, user: User, request: RatingRequest, cockroach_client: CockroachDBClient
+    ) -> None:
+        cockroach_client.query(
+            Feedback.add,
+            items=[
+                Feedback(
+                    from_user_id=user.id, rating=request.rate, feedback=request.comment
+                )
+            ],
+        )
