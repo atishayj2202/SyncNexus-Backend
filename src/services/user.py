@@ -153,6 +153,7 @@ class UserService:
                 to_user_id=payment.to_user_id,
                 currency=payment.currency,
                 remarks=payment.remarks,
+                approved_at=payment.approved_at,
             )
             for payment in payments
         ]

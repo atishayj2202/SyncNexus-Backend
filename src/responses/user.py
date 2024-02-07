@@ -47,3 +47,4 @@ class PaymentResponse(BaseModel):
     currency: str = "INR"
     remarks: str | None = None
     created_at: datetime
+    approved_at: datetime | None = None
