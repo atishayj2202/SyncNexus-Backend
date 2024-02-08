@@ -7,5 +7,5 @@ CREATE TABLE feedbacks
     feedback         TEXT        DEFAULT NULL,
     from_user_id     UUID NOT NULL,
     FOREIGN KEY (from_user_id) REFERENCES user_accounts (id),
-    CHECK (6 > rating > 0)
-)
+    CHECK (rating > 0)
+);

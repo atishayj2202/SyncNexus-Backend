@@ -12,4 +12,4 @@ CREATE TABLE payments
     FOREIGN KEY (from_user_id) REFERENCES user_accounts (id),
     FOREIGN KEY (to_user_id) REFERENCES user_accounts (id),
     CHECK (amount > 0)
-)
+);
