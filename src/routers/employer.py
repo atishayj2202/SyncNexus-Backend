@@ -25,8 +25,8 @@ ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # done
 ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/"  # done
 ENDPOINT_SEARCH_EMPLOYEE = "/{phone_no}/search-employee/"  # done
 ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # pending
-ENDPOINT_ADD_PAYMENT = "/{employee_id}/add-payment/"  # pending
-ENDPOINT_GET_EMPLOYEE_PAYMENT = "/{employee_id}/get-payment/"  # pending
+ENDPOINT_ADD_PAYMENT = "/{employee_id}/add-payment/"  # done
+ENDPOINT_GET_EMPLOYEE_PAYMENT = "/{employee_id}/get-payment/"  # done
 
 
 @employer_router.post(ENDPOINT_ADD_TASK)

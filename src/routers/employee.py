@@ -23,7 +23,7 @@ ENDPOINT_GET_EMPLOYER = "/{employer_id}/get-employer/"  # pending
 ENDPOINT_ADD_LOCATION = "/add-location/"  # done
 ENDPOINT_GET_JOBS = "/get-jobs/"  # done
 ENDPOINT_LEAVE_JOB = "/leave-job/"  # done
-ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # pending
+ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # done
 
 
 @employee_router.post(ENDPOINT_GET_TASKS, response_model=list[TaskResponse])

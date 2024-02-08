@@ -27,8 +27,8 @@ ENDPOINT_SEARCH_USER = "{email_id}/search-user/"  # pending
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # pending
 ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done
 ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done
-ENDPOINT_GET_PAYMENTS = "/get-payments/"  # pending
-ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # pending
+ENDPOINT_GET_PAYMENTS = "/get-payments/"  # done
+ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done
 
 
 @user_router.post(ENDPOINT_CREATE_USER)
