@@ -29,6 +29,7 @@ class UserService:
         return UserResponse(
             id=user.id,
             name=user.name,
+            email=user.email,
             phone_no=user.phone_no,
             user_type=user.user_type,
             created_at=user.created_at,
@@ -42,6 +43,7 @@ class UserService:
         firebase_client: FirebaseClient,
     ) -> None:
         user: User = User(
+            email=request.email,
             phone_no=request.phone_no,
             name=request.name,
             user_type=request.user_type,
@@ -70,7 +72,7 @@ class UserService:
             )
         except auth.UserNotFoundError:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+                status_code=status.HTTP_409_CONFLICT, detail="User already found"
             )
 
     @classmethod

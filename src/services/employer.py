@@ -73,7 +73,7 @@ class EmployerService:
 
     @classmethod
     def add_employee(
-        cls, employee_id: UUID, cockroach_client: CockroachDBClient, user: User
+        cls, employee_id: UUID, cockroach_client: CockroachDBClient, user: User, title:str
     ) -> None:
         cls.__verify_employee(employee_id, user, cockroach_client, is_employer=False)
         employee_mapping = cockroach_client.query(
@@ -93,6 +93,7 @@ class EmployerService:
                 EmployeeMapping(
                     employee_id=employee_id,
                     employer_id=user.id,
+                    title=title,
                 )
             ],
         )
@@ -130,9 +131,9 @@ class EmployerService:
         temp = {}
         for i in employees:
             if i.deleted is not None:
-                temp[i.employee_id] = i.status
+                temp[i.employee_id] = [i.status, i.title]
             else:
-                temp[i.employee_id] = i.status
+                temp[i.employee_id] = [i.status, i.title]
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",
@@ -148,7 +149,8 @@ class EmployerService:
                     employee_id=user.id,
                     name=user.name,
                     phone_no=user.phone_no,
-                    status=temp[user.id],
+                    title=temp[user.id][1],
+                    status=temp[user.id][0],
                 )
             )
         return employee_response
@@ -181,6 +183,7 @@ class EmployerService:
         return UserResponse(
             id=user.id,
             name=user.name,
+            email=user.email,
             phone_no=user.phone_no,
             user_type=user.user_type,
             created_at=user.created_at,

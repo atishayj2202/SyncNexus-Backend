@@ -8,6 +8,7 @@ from src.utils.enums import EmployeeStatus
 
 class EmployeeResponse(BaseModel):
     employee_id: UUID
+    title: str
     name: str
     phone_no: str
     status: EmployeeStatus

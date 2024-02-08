@@ -10,11 +10,13 @@ class UserResponse(BaseModel):
     id: UUID
     name: str
     phone_no: str
+    email: str | None = None
     created_at: datetime
     user_type: UserType
 
 
 class UserCreateRequest(BaseModel):
+    email: str | None = None
     phone_no: str
     name: str
     user_type: UserType

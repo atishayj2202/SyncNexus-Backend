@@ -22,7 +22,7 @@ ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
 ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done
 ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # pending
 ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # done
-ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/"  # done
+ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/{title}"  # done
 ENDPOINT_SEARCH_EMPLOYEE_PHONE = "/{phone_no}/search-employee-phone/"  # done
 ENDPOINT_SEARCH_EMPLOYEE_EMAIL = "{email_id}/search-user-email/"  # pending
 ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # pending
@@ -43,6 +43,7 @@ async def post_add_task(
 @employer_router.post(ENDPOINT_ADD_EMPLOYEE)
 async def get_add_employee(
     employee_id: UUID,
+    title: str,
     cockroach_client: CockroachDBClient = Depends(),
     verified_user: VerifiedUser = Depends(user_auth.verify_employer),
 ):
