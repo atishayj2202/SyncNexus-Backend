@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
 from src.db.tables.employee_location import EmployeeLocation
-from src.db.tables.employee_mapping import Employee_Mapping
+from src.db.tables.employee_mapping import EmployeeMapping
 from src.db.tables.job import Jobs
 from src.db.tables.payment import Payment
 from src.db.tables.task import Task
@@ -33,7 +33,7 @@ class EmployerService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Employee not Found"
             )
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "employer_id", "deleted"],
             match_values=[employee_id, employer.id, None],
             error_not_exist=False,
@@ -77,7 +77,7 @@ class EmployerService:
     ) -> None:
         cls.__verify_employee(employee_id, user, cockroach_client, is_employer=False)
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "deleted"],
             match_values=[employee_id, None],
             error_not_exist=False,
@@ -88,9 +88,9 @@ class EmployerService:
                 detail="Employee is Employed",
             )
         cockroach_client.query(
-            Employee_Mapping.add,
+            EmployeeMapping.add,
             items=[
-                Employee_Mapping(
+                EmployeeMapping(
                     employee_id=employee_id,
                     employer_id=user.id,
                 )
@@ -121,8 +121,8 @@ class EmployerService:
     def fetch_employees(
         cls, cockroach_client: CockroachDBClient, user: User
     ) -> list[EmployeeResponse]:
-        employees: list[Employee_Mapping] = cockroach_client.query(
-            Employee_Mapping.get_by_field_multiple,
+        employees: list[EmployeeMapping] = cockroach_client.query(
+            EmployeeMapping.get_by_field_multiple,
             field="employer_id",
             match_value=user.id,
             error_not_exist=False,
@@ -168,7 +168,7 @@ class EmployerService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not Found"
             )
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "deleted"],
             match_values=[user.id, None],
             error_not_exist=False,

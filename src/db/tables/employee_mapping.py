@@ -6,9 +6,10 @@ from src.db.base import Base, DBSchemaBase
 from src.utils.enums import EmployeeStatus
 
 
-class Employee_Mapping(DBSchemaBase):
+class EmployeeMapping(DBSchemaBase):
     employee_id: UUID
     employer_id: UUID
+    title: str = "Employee"
     deleted: datetime | None = None
     status: EmployeeStatus = EmployeeStatus.active
 
@@ -17,4 +18,4 @@ class Employee_Mapping(DBSchemaBase):
         return _Employee_Mapping
 
 
-_Employee_Mapping = Base.from_schema_base(Employee_Mapping, "employee_mapping")
+_Employee_Mapping = Base.from_schema_base(EmployeeMapping, "employee_mapping")
