@@ -10,11 +10,13 @@ class UserResponse(BaseModel):
     id: UUID
     name: str
     phone_no: str
+    email: str | None = None
     created_at: datetime
     user_type: UserType
 
 
 class UserCreateRequest(BaseModel):
+    email: str | None = None
     phone_no: str
     name: str
     user_type: UserType
@@ -30,3 +32,21 @@ class RatingResponse(BaseModel):
     rate: int
     comment: str | None = None
     count: int
+
+
+class PaymentRequest(BaseModel):
+    amount: int
+    to_user_id: UUID
+    currency: str = "INR"
+    remarks: str | None = None
+
+
+class PaymentResponse(BaseModel):
+    id: UUID
+    amount: int
+    from_user_id: UUID
+    to_user_id: UUID
+    currency: str = "INR"
+    remarks: str | None = None
+    created_at: datetime
+    approved_at: datetime | None = None

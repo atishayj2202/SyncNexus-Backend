@@ -11,8 +11,13 @@ def _get_requesting_user(
 ) -> User:
     firebase_user_id = get_user_from_token(firebase_client, authorization)
     user = cockroach_client.query(
-        User.get_by_field_unique, field="firebase_user_id", match_value=firebase_user_id
+        User.get_by_field_unique,
+        field="firebase_user_id",
+        match_value=firebase_user_id,
+        error_not_exist=False,
     )
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     return user
 
 

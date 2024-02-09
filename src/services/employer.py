@@ -1,25 +1,29 @@
-from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException, status
 
 from src.client.cockroach import CockroachDBClient
 from src.db.tables.employee_location import EmployeeLocation
-from src.db.tables.employee_mapping import Employee_Mapping
+from src.db.tables.employee_mapping import EmployeeMapping
 from src.db.tables.job import Jobs
+from src.db.tables.payment import Payment
 from src.db.tables.task import Task
 from src.db.tables.user import User
-from src.responses.employee import EmployeeCreateRequest, EmployeeResponse
+from src.responses.employee import EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
-from src.responses.user import UserResponse
+from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
 
 
 class EmployerService:
     @classmethod
     def __verify_employee(
-        cls, employee_id: UUID, employer: User, cockroach_client: CockroachDBClient
+        cls,
+        employee_id: UUID,
+        employer: User,
+        cockroach_client: CockroachDBClient,
+        is_employer: bool = True,
     ) -> None:
         employee = cockroach_client.query(
             User.get_id, id=employee_id, error_not_exist=False
@@ -29,18 +33,17 @@ class EmployerService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Employee not Found"
             )
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "employer_id", "deleted"],
             match_values=[employee_id, employer.id, None],
             error_not_exist=False,
         )
-        if employee_mapping is None:
+        if employee_mapping is None and is_employer:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Employee not Under Employer",
             )
-
-        if employee_mapping is not None:
+        if employee_mapping is not None and not is_employer:
             raise HTTPException(
                 status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 detail="Employee is already Employed",
@@ -50,13 +53,15 @@ class EmployerService:
     def add_task(
         cls, request: TaskCreateRequest, cockroach_client: CockroachDBClient, user: User
     ) -> None:
-        cls.__verify_employee(request.employee_id, user, cockroach_client)
+        cls.__verify_employee(
+            request.employee_id, user, cockroach_client, is_employer=True
+        )
         cockroach_client.query(
             Task.add,
             items=[
                 Task(
                     employee_id=request.employee_id,
-                    employer_id=request.employer_id,
+                    employer_id=user.id,
                     heading=request.heading,
                     description=request.description,
                     last_date=request.last_date,
@@ -68,12 +73,13 @@ class EmployerService:
 
     @classmethod
     def add_employee(
-        cls, request: EmployeeCreateRequest, cockroach_client: CockroachDBClient
+        cls, employee_id: UUID, cockroach_client: CockroachDBClient, user: User, title:str
     ) -> None:
+        cls.__verify_employee(employee_id, user, cockroach_client, is_employer=False)
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "deleted"],
-            match_values=[request.employee_id, None],
+            match_values=[employee_id, None],
             error_not_exist=False,
         )
         if employee_mapping is not None:
@@ -82,11 +88,12 @@ class EmployerService:
                 detail="Employee is Employed",
             )
         cockroach_client.query(
-            Employee_Mapping.add,
+            EmployeeMapping.add,
             items=[
-                Employee_Mapping(
-                    employee_id=request.employee_id,
-                    employer_id=request.employer_id,
+                EmployeeMapping(
+                    employee_id=employee_id,
+                    employer_id=user.id,
+                    title=title,
                 )
             ],
         )
@@ -115,8 +122,8 @@ class EmployerService:
     def fetch_employees(
         cls, cockroach_client: CockroachDBClient, user: User
     ) -> list[EmployeeResponse]:
-        employees: list[Employee_Mapping] = cockroach_client.query(
-            Employee_Mapping.get_by_field_multiple,
+        employees: list[EmployeeMapping] = cockroach_client.query(
+            EmployeeMapping.get_by_field_multiple,
             field="employer_id",
             match_value=user.id,
             error_not_exist=False,
@@ -124,23 +131,26 @@ class EmployerService:
         temp = {}
         for i in employees:
             if i.deleted is not None:
-                temp[i.id] = i.status
+                temp[i.employee_id] = [i.status, i.title]
             else:
-                temp[i.id] = i.status
+                temp[i.employee_id] = [i.status, i.title]
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",
-            match_values=temp.keys,
+            match_values=temp.keys(),
             error_not_exist=False,
         )
         employee_response = []
+        if users is None:
+            return employee_response
         for user in users:
             employee_response.append(
                 EmployeeResponse(
                     employee_id=user.id,
                     name=user.name,
                     phone_no=user.phone_no,
-                    status=temp[user.id],
+                    title=temp[user.id][1],
+                    status=temp[user.id][0],
                 )
             )
         return employee_response
@@ -160,7 +170,7 @@ class EmployerService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not Found"
             )
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "deleted"],
             match_values=[user.id, None],
             error_not_exist=False,
@@ -173,6 +183,7 @@ class EmployerService:
         return UserResponse(
             id=user.id,
             name=user.name,
+            email=user.email,
             phone_no=user.phone_no,
             user_type=user.user_type,
             created_at=user.created_at,
@@ -189,6 +200,7 @@ class EmployerService:
             end_time=request.end_time,
             field="employee_id",
             match_value=user.id,
+            error_not_exist=False,
         )
         if locations is None:
             raise HTTPException(
@@ -201,4 +213,49 @@ class EmployerService:
                 created_at=location.created_at,
             )
             for location in locations
+        ]
+
+    @classmethod
+    def add_payment(
+        cls, user: User, request: PaymentRequest, cockroach_client: CockroachDBClient
+    ) -> None:
+        cockroach_client.query(
+            Payment.add,
+            items=[
+                Payment(
+                    amount=request.amount,
+                    from_user_id=user.id,
+                    to_user_id=request.to_user_id,
+                    currency=request.currency,
+                    remarks=request.remarks,
+                )
+            ],
+        )
+
+    @classmethod
+    def fetch_employee_payments(
+        cls, cockroach_client: CockroachDBClient, user: User, user_id: UUID
+    ) -> list[PaymentResponse]:
+        payments: list[Payment] | None = cockroach_client.query(
+            Payment.get_by_multiple_field_unique,
+            fields=["from_user_id", "to_user_id"],
+            match_values=[user.id, user_id],
+            error_not_exist=False,
+        )
+        if payments is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No Payments Found"
+            )
+        return [
+            PaymentResponse(
+                id=payment.id,
+                amount=payment.amount,
+                created_at=payment.created_at,
+                from_user_id=payment.from_user_id,
+                to_user_id=payment.to_user_id,
+                currency=payment.currency,
+                remarks=payment.remarks,
+                approved_at=payment.approved_at,
+            )
+            for payment in payments
         ]

@@ -12,7 +12,7 @@ from typing import Any, List, Optional, Type
 from pydantic import BaseModel, Field
 from sqlalchemy import ARRAY, JSON, Boolean, Column, DateTime
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy import Float, Integer, String, func, select
+from sqlalchemy import Float, Integer, String, and_, func, select
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeMeta, Session, declared_attr
@@ -182,7 +182,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(func.and_(getattr(schema_cls, field) == match_value))
+            .filter(and_(getattr(schema_cls, field) == match_value))
             .first()
         )
         if result:
@@ -200,19 +200,19 @@ class DBSchemaBase(BaseModel, ABC):
         fields: list[str],
         match_values: list[Any],
         error_not_exist: bool = False,
-    ) -> list[DBSchemaBase] | None:
+    ) -> DBSchemaBase | None:
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
             .filter(
-                func.and_(
+                and_(
                     *(getattr(schema_cls, f) == v for f, v in zip(fields, match_values))
                 )
             )
             .first()
         )
         if result:
-            return [cls.model_validate(r, from_attributes=True) for r in result]
+            return cls.model_validate(result, from_attributes=True)
         if error_not_exist:
             raise Exception(
                 f"Could not find a record in {schema_cls.__name__} with {fields} {match_values}"
@@ -227,11 +227,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(
-                func.and_(
-                    getattr(schema_cls, field) == match_value,
-                )
-            )
+            .filter(and_(getattr(schema_cls, field) == match_value))
             .all()
         )
         if result:
@@ -257,7 +253,7 @@ class DBSchemaBase(BaseModel, ABC):
         result = (
             db.query(schema_cls)
             .filter(
-                func.and_(
+                and_(
                     getattr(schema_cls, field) == match_value,
                     getattr(schema_cls, time_field).between(start_time, end_time),
                 )
@@ -284,7 +280,7 @@ class DBSchemaBase(BaseModel, ABC):
         schema_cls = cls._schema_cls()
         result = (
             db.query(schema_cls)
-            .filter(func.and_(getattr(schema_cls, field).in_(match_values)))
+            .filter(getattr(schema_cls, field).in_(match_values))
             .all()
         )
         if result:
@@ -327,7 +323,7 @@ class DBSchemaBase(BaseModel, ABC):
         model_column = cls.get_field(model_field)
         result = (
             db.query(schema_cls)
-            .filter(func.and_(getattr(schema_cls, field) == match_value))
+            .filter(and_(getattr(schema_cls, field) == match_value))
             .order_by(model_column.desc())
             .first()
         )

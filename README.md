@@ -31,3 +31,13 @@ The following commands can be used:
 poetry run sh deploy/local_test.sh check-format
 poetry run sh deploy/local_test.sh format
 ```
+
+```shell
+poetry run bumpversion --config-file=./deploy/.bumpversion.cfg <option>
+```
+The option can be:
+- patch: to update the patch version
+- minor: to update the minor version
+- major: to update the major version
+- release: to update the release version
+  - also add `--tag` to create a git tag when releasing

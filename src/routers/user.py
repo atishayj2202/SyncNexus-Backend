@@ -9,20 +9,25 @@ from src.auth.user_auth import VerifiedUser
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.responses.user import (
+    PaymentResponse,
     RatingRequest,
     RatingResponse,
     UserCreateRequest,
     UserResponse,
 )
+from src.responses.util import DurationRequest
 from src.services.user import UserService
 
 USER_PREFIX = "/user"
 user_router = APIRouter(prefix=USER_PREFIX)
 ENDPOINT_CREATE_USER = "/create-user/"  # done
+ENDPOINT_CHECK_USER = "/check-user/"  # done
 ENDPOINT_GET_USER = "/{user_id}/get-user/"  # done
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # pending
 ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done
 ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done
+ENDPOINT_GET_PAYMENTS = "/get-payments/"  # done
+ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done
 
 
 @user_router.post(ENDPOINT_CREATE_USER)
@@ -32,6 +37,14 @@ async def post_create_user(
     firebase_client: FirebaseClient = Depends(),
 ):
     UserService.create_user(request, cockroach_client, firebase_client)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@user_router.get(
+    ENDPOINT_CHECK_USER,
+    dependencies=[Depends(user_auth.verify_user)],
+)
+async def get_check_user():
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -68,3 +81,33 @@ async def get_user(
     cockroach_client: CockroachDBClient = Depends(),
 ):
     return UserService.fetch_rating(user_id=user_id, cockroach_client=cockroach_client)
+
+
+@user_router.post(
+    ENDPOINT_GET_PAYMENTS,
+    response_model=list[PaymentResponse],
+)
+async def get_payments(
+    request: DurationRequest,
+    cockroach_client: CockroachDBClient = Depends(),
+    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    return UserService.get_payments(
+        user=verified_user.requesting_user,
+        cockroach_client=cockroach_client,
+        request=request,
+    )
+
+
+@user_router.post(ENDPOINT_ADD_FEEDBACK)
+async def post_add_feedback(
+    request: RatingRequest,
+    cockroach_client: CockroachDBClient = Depends(),
+    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+):
+    UserService.add_feedback(
+        user=verified_user.requesting_user,
+        request=request,
+        cockroach_client=cockroach_client,
+    )
+    return Response(status_code=status.HTTP_200_OK)

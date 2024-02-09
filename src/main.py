@@ -11,7 +11,7 @@ from src.routers.employee import employee_router
 from src.routers.employer import employer_router
 from src.routers.user import user_router
 
-app = FastAPI(title="Google Solution Challenge Backend", version="0.1.0")
+app = FastAPI(title="Google Solution Challenge Backend", version="0.1.2")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
 
@@ -45,7 +45,7 @@ app.add_middleware(
 )
 
 
-@app.middleware("http")
+'''@app.middleware("http")
 async def error_middleware(request: Request, call_next):
     try:
         return await call_next(request)
@@ -55,7 +55,7 @@ async def error_middleware(request: Request, call_next):
         return Response(
             content="Internal Server Error",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        )'''
 
 
 app.include_router(user_router)

@@ -5,8 +5,9 @@ from starlette import status
 
 from src.client.cockroach import CockroachDBClient
 from src.db.tables.employee_location import EmployeeLocation
-from src.db.tables.employee_mapping import Employee_Mapping
+from src.db.tables.employee_mapping import EmployeeMapping
 from src.db.tables.job import Jobs
+from src.db.tables.payment import Payment
 from src.db.tables.task import Task
 from src.db.tables.user import User
 from src.responses.job import JobResponse
@@ -87,9 +88,10 @@ class EmployeeService:
             ],
         )
 
+    @classmethod
     def leave_job(cls, cockroach_client: CockroachDBClient, user: User):
         employee_mapping = cockroach_client.query(
-            Employee_Mapping.get_by_multiple_field_unique,
+            EmployeeMapping.get_by_multiple_field_unique,
             fields=["employee_id", "deleted"],
             match_values=[user.id, None],
             error_not_exist=False,
@@ -102,7 +104,7 @@ class EmployeeService:
         employee_mapping.deleted = get_current_time()
         employee_mapping.status = EmployeeStatus.left
         cockroach_client.query(
-            Employee_Mapping.update_by_id,
+            EmployeeMapping.update_by_id,
             id=employee_mapping.id,
             new_data=employee_mapping,
         )
@@ -130,6 +132,11 @@ class EmployeeService:
         task: Task,
         cockroach_client: CockroachDBClient,
     ) -> None:
+        if task.completed is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task Already Completed",
+            )
         task.completed = get_current_time()
         cockroach_client.query(
             Task.update_by_id,
@@ -154,3 +161,32 @@ class EmployeeService:
                 detail="No Jobs Found",
             )
         return [cls.fetch_job_detail(job=job) for job in jobs]
+
+    @classmethod
+    def approve_payment(
+        cls,
+        payment_id: UUID,
+        user: User,
+        cockroach_client: CockroachDBClient,
+    ) -> None:
+        payment: Payment = cockroach_client.query(
+            Payment.get_id,
+            id=payment_id,
+            error_not_exist=False,
+        )
+        if payment is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Payment Not Found",
+            )
+        if payment.to_user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Payment Not for User",
+            )
+        payment.approved_at = get_current_time()
+        cockroach_client.query(
+            Payment.update_by_id,
+            id=payment.id,
+            new_data=payment,
+        )

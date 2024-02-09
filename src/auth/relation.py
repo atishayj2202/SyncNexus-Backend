@@ -7,7 +7,7 @@ from starlette import status
 from src.auth.base import _get_requesting_user
 from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
-from src.db.tables.employee_mapping import Employee_Mapping
+from src.db.tables.employee_mapping import EmployeeMapping
 from src.db.tables.user import User
 
 
@@ -39,7 +39,7 @@ def verify_employee_s_employer(
     if employee.id == user.id:
         return VerifiedEmployee(employee=employee, employer=None)
     employee_mapping = cockroach_client.query(
-        Employee_Mapping.get_by_multiple_field_unique,
+        EmployeeMapping.get_by_multiple_field_unique,
         fields=["employee_id", "employer_id", "deleted"],
         match_values=[employee_id, user.id, None],
         error_not_exist=False,
@@ -70,7 +70,7 @@ def verify_employer_s_employee(
     if employer.id == user.id:
         return VerifiedEmployer(employee=None, employer=employer)
     employee_mapping = cockroach_client.query(
-        Employee_Mapping.get_by_multiple_field_unique,
+        EmployeeMapping.get_by_multiple_field_unique,
         fields=["employee_id", "employer_id", "deleted"],
         match_values=[user.id, employer.id, None],
         error_not_exist=False,

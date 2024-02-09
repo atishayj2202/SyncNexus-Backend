@@ -1,14 +1,14 @@
 set -e
 usage="Usage: sh deploy/staging.sh [migrate|build_push]"
 
-export PROJECT_NAME=google-solution-challenge
+export PROJECT_NAME=winged-octagon-413211
 
 # docker details
 export IMAGE_NAME=google-solution-challenge-backend
-export IMAGE_VERSION=0.1.0
+export IMAGE_VERSION=0.1.2
 export SERVICE_NAME=google-solution-challenge-server
 export REPOSITORY_NAME=google-solution-challenge-backend
-export FULL_IMAGE_NAME=us-east4-docker.pkg.dev/${PROJECT_NAME}/${REPOSITORY_NAME}/${IMAGE_NAME}:${IMAGE_VERSION}
+export FULL_IMAGE_NAME=asia-south2-docker.pkg.dev/${PROJECT_NAME}/${REPOSITORY_NAME}/${IMAGE_NAME}:${IMAGE_VERSION}
 export FLYWAY_CONTAINER_NAME=flyway/flyway:latest
 export FLYWAY_CONFIG_PATH="$PWD"/keys/conf
 export FLYWAY_MIGRATION_PATH="$PWD"/deploy/lexxa-flyway/migrations
