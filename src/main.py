@@ -45,7 +45,7 @@ app.add_middleware(
 )
 
 
-'''@app.middleware("http")
+@app.middleware("http")
 async def error_middleware(request: Request, call_next):
     try:
         return await call_next(request)
@@ -55,7 +55,7 @@ async def error_middleware(request: Request, call_next):
         return Response(
             content="Internal Server Error",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )'''
+        )
 
 
 app.include_router(user_router)
