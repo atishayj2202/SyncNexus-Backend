@@ -6,6 +6,7 @@ CREATE TABLE employee_location
     employee_id      UUID    NOT NULL,
     location_lat     NUMERIC NOT NULL,
     location_long    NUMERIC NOT NULL,
-    FOREIGN KEY (employee_id) REFERENCES user_accounts (id),
-    INDEX idx_location_session (employee_id)
+    FOREIGN KEY (employee_id) REFERENCES user_accounts (id)
 );
+
+CREATE INDEX idx_location_session ON employee_location(employee_id);

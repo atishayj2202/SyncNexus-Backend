@@ -129,6 +129,8 @@ class EmployerService:
             error_not_exist=False,
         )
         temp = {}
+        if employees is None:
+            return []
         for i in employees:
             if i.deleted is not None:
                 temp[i.employee_id] = [i.status, i.title]

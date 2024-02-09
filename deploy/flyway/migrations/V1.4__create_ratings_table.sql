@@ -9,6 +9,6 @@ CREATE TABLE rating
     comment          TEXT        DEFAULT NULL,
     FOREIGN KEY (user_from) REFERENCES user_accounts (id),
     FOREIGN KEY (user_to) REFERENCES user_accounts (id),
-    CONSTRAINT unique_rating UNIQUE (user_from, user_to),
-    INDEX idx_rating_to (user_to)
+    CONSTRAINT unique_rating UNIQUE (user_from, user_to)
 );
+CREATE INDEX idx_rating_to ON rating(user_to);

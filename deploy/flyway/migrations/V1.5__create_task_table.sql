@@ -12,7 +12,8 @@ CREATE TABLE task
     completed        TIMESTAMPTZ DEFAULT NULL,
     FOREIGN KEY (employee_id) REFERENCES user_accounts (id),
     FOREIGN KEY (employer_id) REFERENCES user_accounts (id),
-    CHECK (last_date IS NULL OR last_date > NOW()),
-    INDEX idx_task_employee (employee_id),
-    INDEX idx_task_employer (employer_id)
+    CHECK (last_date IS NULL OR last_date > NOW())
 );
+
+CREATE INDEX idx_task_employee ON task(employee_id);
+CREATE INDEX idx_task_employer ON task(employer_id)

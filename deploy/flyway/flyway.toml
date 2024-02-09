@@ -26,3 +26,10 @@ validateMigrationNaming = true
 url = "jdbc:postgresql://air-transfer-12735.5xj.cockroachlabs.cloud:26257/Google-Solution-Challenge?sslmode=verify-full&sslrootcert=/Users/atishayjain/PycharmProjects/Google-Solution-Challenge/keys/root.crt"
 schemas = [ "public" ]
 displayName = "google-solution-cockroach"
+
+[environments.Google_Cloud_SQL]
+url = "jdbc:postgresql://127.0.0.1:3308/postgres"
+user = "admin"
+password = ".<8BbCC;$qJnl=F^"
+schemas = [ "public" ]
+displayName = "Google Cloud SQL"
