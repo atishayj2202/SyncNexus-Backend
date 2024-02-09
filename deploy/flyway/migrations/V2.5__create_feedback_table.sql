@@ -9,3 +9,5 @@ CREATE TABLE feedbacks
     FOREIGN KEY (from_user_id) REFERENCES user_accounts (id),
     CHECK (rating > 0)
 );
+
+CREATE INDEX feedbacks_from_user_id_idx ON feedbacks (from_user_id);

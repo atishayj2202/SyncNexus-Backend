@@ -11,7 +11,7 @@ CREATE TABLE jobs
     location_long    NUMERIC NOT NULL,
     done             TIMESTAMPTZ DEFAULT NULL,
     amount           BIGINT,
-    FOREIGN KEY (employer_id) REFERENCES user_accounts (id),
-    INDEX idx_jobs_location (location_lat, location_long),
-    INDEX idx_employer (employer_id)
+    FOREIGN KEY (employer_id) REFERENCES user_accounts (id)
 );
+CREATE INDEX idx_jobs_location ON jobs (location_lat, location_long);
+CREATE INDEX idx_employer ON jobs (employer_id);

@@ -6,8 +6,9 @@ CREATE TABLE employee_mapping
     employee_id      UUID NOT NULL,
     employer_id      UUID NOT NULL,
     deleted          TIMESTAMPTZ DEFAULT NULL,
-    INDEX idx_employee (employee_id),
-    INDEX idx_employer (employer_id),
     FOREIGN KEY (employee_id) REFERENCES user_accounts (id),
     FOREIGN KEY (employer_id) REFERENCES user_accounts (id)
 );
+
+CREATE INDEX idx_employee ON employee_mapping(employee_id);
+CREATE INDEX idx_employer_mapping ON employee_mapping(employer_id);

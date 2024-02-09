@@ -10,7 +10,8 @@ CREATE TABLE user_accounts
     firebase_user_id VARCHAR   NOT NULL,
     user_type        user_type NOT NULL,
     UNIQUE (firebase_user_id),
-    UNIQUE (phone_no),
-    INDEX idx_firebase_user_id (firebase_user_id),
-    INDEX idx_phone_no (phone_no)
+    UNIQUE (phone_no)
 );
+
+CREATE INDEX idx_firebase_user_id ON user_accounts(firebase_user_id);
+CREATE INDEX idx_phone_no ON user_accounts(phone_no)

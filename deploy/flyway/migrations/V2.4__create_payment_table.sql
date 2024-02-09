@@ -13,3 +13,6 @@ CREATE TABLE payments
     FOREIGN KEY (to_user_id) REFERENCES user_accounts (id),
     CHECK (amount > 0)
 );
+
+CREATE INDEX payments_from_user_id_idx ON payments (from_user_id);
+CREATE INDEX payments_to_user_id_idx ON payments (to_user_id);
