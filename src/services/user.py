@@ -56,21 +56,19 @@ class UserService:
             user_firebase.custom_claims is not None
             and firebase_client.user_key in user_firebase.custom_claims
         ):
-            raise HTTPException(
-                status_code=status.HTTP_417_EXPECTATION_FAILED,
-                detail="User already exists",
+            user.id = user_firebase.custom_claims[firebase_client.user_key]
+        else:
+            auth.set_custom_user_claims(
+                request.firebase_user_id,
+                {firebase_client.user_key: str(user.id)},
+                app=firebase_client.app,
             )
         try:
             cockroach_client.query(
                 User.add,
                 items=[user],
             )
-            auth.set_custom_user_claims(
-                request.firebase_user_id,
-                {firebase_client.user_key: str(user.id)},
-                app=firebase_client.app,
-            )
-        except auth.UserNotFoundError:
+        except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="User already found"
             )

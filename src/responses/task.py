@@ -20,5 +20,5 @@ class TaskResponse(BaseModel):
     employee_id: UUID
     heading: str
     description: str | None = None
-    last_date: str | None = None
+    last_date: datetime | None = None
     status: TaskStatus

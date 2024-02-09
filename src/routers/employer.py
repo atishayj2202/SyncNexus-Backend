@@ -40,7 +40,7 @@ async def post_add_task(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@employer_router.post(ENDPOINT_ADD_EMPLOYEE)
+@employer_router.get(ENDPOINT_ADD_EMPLOYEE)
 async def get_add_employee(
     employee_id: UUID,
     title: str,
@@ -53,7 +53,7 @@ async def get_add_employee(
             detail="You cannot add yourself as an employee",
         )
     EmployerService.add_employee(
-        employee_id, cockroach_client, verified_user.requesting_user
+        employee_id=employee_id, cockroach_client=cockroach_client, user=verified_user.requesting_user,title=title
     )
     return Response(status_code=status.HTTP_200_OK)
 
