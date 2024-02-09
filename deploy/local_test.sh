@@ -72,7 +72,7 @@ then
   chmod +x cloud-sql-proxy
 elif [[ $1 = "remote-start" ]]
 then
-  ./cloud-sql-proxy $GOOGLE_CLOUD_SQL_CONNECTION --credentials-file=$GOOGLE_CLOUD_SQL_CREDENTIALS_FILE --port=3308
+  ./cloud-sql-proxy $GOOGLE_CLOUD_SQL_CONNECTION --credentials-file=$GOOGLE_CLOUD_SQL_CREDENTIALS_FILE --unix-socket="./keys/"
 else
   echo "${usage}"
   exit 1

@@ -73,7 +73,11 @@ class EmployerService:
 
     @classmethod
     def add_employee(
-        cls, employee_id: UUID, cockroach_client: CockroachDBClient, user: User, title:str
+        cls,
+        employee_id: UUID,
+        cockroach_client: CockroachDBClient,
+        user: User,
+        title: str,
     ) -> None:
         cls.__verify_employee(employee_id, user, cockroach_client, is_employer=False)
         employee_mapping = cockroach_client.query(
