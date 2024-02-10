@@ -2,6 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from starlette import status
+from starlette.exceptions import HTTPException
 from starlette.responses import Response
 
 from src.auth import user_auth
@@ -22,12 +23,12 @@ USER_PREFIX = "/user"
 user_router = APIRouter(prefix=USER_PREFIX)
 ENDPOINT_CREATE_USER = "/create-user/"  # done | integrated
 ENDPOINT_CHECK_USER = "/check-user/"  # done | integrated
-ENDPOINT_GET_USER = "/{user_id}/get-user/"  # done
+ENDPOINT_GET_USER = "/get-user/"  # done | integrated
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # deprecated
-ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done
-ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done
-ENDPOINT_GET_PAYMENTS = "/get-payments/"  # done
-ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done
+ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done | integrated
+ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done | integrated
+ENDPOINT_GET_PAYMENTS = "/get-payments/"  # done | integrated
+ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done | integrated
 
 
 @user_router.post(ENDPOINT_CREATE_USER)
@@ -62,6 +63,10 @@ async def post_create_rating(
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
     cockroach_client: CockroachDBClient = Depends(),
 ):
+    if user_id == verified_user.requesting_user.id:
+        raise HTTPException(
+            status_code=400, detail="User cannot rate themselves"
+        )
     UserService.create_rating(
         user_from=verified_user.requesting_user,
         user_to_id=user_id,
@@ -76,7 +81,7 @@ async def post_create_rating(
     response_model=RatingResponse,
     dependencies=[Depends(user_auth.verify_user)],
 )
-async def get_user(
+async def get_rating(
     user_id: UUID,
     cockroach_client: CockroachDBClient = Depends(),
 ):

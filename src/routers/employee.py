@@ -18,13 +18,13 @@ EMPLOYEE_PREFIX = "/employee"
 employee_router = APIRouter(prefix=EMPLOYEE_PREFIX)
 ENDPOINT_GET_TASKS = "/{employee_id}/get-tasks/"  # done | integrated
 ENDPOINT_GET_TASK = "/{task_id}/get-task/"  # done | integrated
-ENDPOINT_GET_JOB_DETAIL = "/{job_id}/get-job-detail/"  # done
+ENDPOINT_GET_JOB_DETAIL = "/{job_id}/get-job-detail/"  # done | review
 ENDPOINT_COMPLETE_TASK = "/{task_id}/complete-task/"  # done | integrated
-ENDPOINT_GET_EMPLOYER = "/get-employer/"  # done
-ENDPOINT_ADD_LOCATION = "/add-location/"  # done
-ENDPOINT_GET_JOBS = "/get-jobs/"  # done
-ENDPOINT_LEAVE_JOB = "/leave-job/"  # done
-ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # done
+ENDPOINT_GET_EMPLOYER = "/get-employer/"  # done | review
+ENDPOINT_ADD_LOCATION = "/add-location/"  # done | review
+ENDPOINT_GET_JOBS = "/get-jobs/"  # done | review
+ENDPOINT_LEAVE_JOB = "/leave-job/"  # done | review
+ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # done | review
 
 
 @employee_router.post(ENDPOINT_GET_TASKS, response_model=list[TaskResponse])
