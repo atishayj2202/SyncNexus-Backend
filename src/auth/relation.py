@@ -30,14 +30,15 @@ def verify_employee_s_employer(
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
+    if employee_id == user.id:
+        return VerifiedEmployee(employee=user, employer=None)
     employee = cockroach_client.query(
         User.get_id,
         id=employee_id,
+        error_not_exist=False,
     )
     if employee is None:
         raise HTTPException(status_code=401, detail="Employee not found")
-    if employee.id == user.id:
-        return VerifiedEmployee(employee=employee, employer=None)
     employee_mapping = cockroach_client.query(
         EmployeeMapping.get_by_multiple_field_unique,
         fields=["employee_id", "employer_id", "deleted"],
@@ -61,14 +62,15 @@ def verify_employer_s_employee(
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
+    if employer_id == user.id:
+        return VerifiedEmployer(employee=None, employer=user)
     employer = cockroach_client.query(
         User.get_id,
         id=employer_id,
+        error_not_exist=False,
     )
     if employer is None:
         raise HTTPException(status_code=401, detail="Employee not found")
-    if employer.id == user.id:
-        return VerifiedEmployer(employee=None, employer=employer)
     employee_mapping = cockroach_client.query(
         EmployeeMapping.get_by_multiple_field_unique,
         fields=["employee_id", "employer_id", "deleted"],

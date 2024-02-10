@@ -53,7 +53,10 @@ async def get_add_employee(
             detail="You cannot add yourself as an employee",
         )
     EmployerService.add_employee(
-        employee_id=employee_id, cockroach_client=cockroach_client, user=verified_user.requesting_user,title=title
+        employee_id=employee_id,
+        cockroach_client=cockroach_client,
+        user=verified_user.requesting_user,
+        title=title,
     )
     return Response(status_code=status.HTTP_200_OK)
 
