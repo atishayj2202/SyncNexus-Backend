@@ -9,6 +9,7 @@ from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.tables.employee_mapping import EmployeeMapping
 from src.db.tables.user import User
+from src.utils.enums import UserType
 
 
 class VerifiedEmployee(BaseModel):
@@ -30,7 +31,7 @@ def verify_employee_s_employer(
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
-    if employee_id == user.id:
+    if employee_id == user.id or user.user_type == UserType.employee:
         return VerifiedEmployee(employee=user, employer=None)
     employee = cockroach_client.query(
         User.get_id,
@@ -62,7 +63,7 @@ def verify_employer_s_employee(
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
-    if employer_id == user.id:
+    if employer_id == user.id or user.user_type == UserType.employer:
         return VerifiedEmployer(employee=None, employer=user)
     employer = cockroach_client.query(
         User.get_id,

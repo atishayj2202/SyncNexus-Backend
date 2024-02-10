@@ -14,6 +14,7 @@ from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
+from src.utils.enums import UserType
 
 
 class EmployerService:
@@ -165,13 +166,13 @@ class EmployerService:
     def search_employee(
         cls, cockroach_client: CockroachDBClient, phone_no: str
     ) -> UserResponse:
-        user = cockroach_client.query(
+        user : User = cockroach_client.query(
             User.get_by_field_unique,
             field="phone_no",
             match_value=phone_no,
             error_not_exist=False,
         )
-        if user is None:
+        if user is None or user.user_type == UserType.employer:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not Found"
             )
