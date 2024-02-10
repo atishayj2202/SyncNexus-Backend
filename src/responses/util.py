@@ -12,4 +12,4 @@ class DurationRequest(BaseModel):
 class Location(BaseModel):
     location_lat: float
     location_long: float
-    created_at: datetime | None
+    created_at: datetime | None = None

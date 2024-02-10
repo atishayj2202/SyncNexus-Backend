@@ -121,7 +121,6 @@ class EmployeeService:
             location=Location(
                 location_lat=job.location_lat, location_long=job.location_long
             ),
-            last_date=job.last_date,
             done=job.done,
             amount=job.amount,
             deleted=job.deleted,
@@ -184,6 +183,11 @@ class EmployeeService:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Payment Not for User",
+            )
+        if payment.approved_at is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Payment Already Approved",
             )
         payment.approved_at = get_current_time()
         cockroach_client.query(

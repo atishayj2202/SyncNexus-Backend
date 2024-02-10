@@ -146,28 +146,20 @@ class DBSchemaBase(BaseModel, ABC):
         error_not_exist: bool = False,
     ) -> List[DBSchemaBase] | None:
         schema_cls = cls._schema_cls()
-        stmt = select(
-            [
-                cls._schema_cls(),
-                func.ST_Distance_Sphere(
-                    func.ST_MakePoint(lon, lat),
-                    func.ST_MakePoint(
-                        getattr(schema_cls, "location_long"),
-                        getattr(schema_cls, "location_lat"),
-                    ),
-                ).label("distance"),
-            ]
-        ).where(
-            func.ST_Distance_Sphere(
-                func.ST_MakePoint(lon, lat),
-                func.ST_MakePoint(
-                    getattr(schema_cls, "location_long"),
-                    getattr(schema_cls, "location_lat"),
-                ),
+        result = (
+            db.query(schema_cls)
+            .filter(
+                and_(
+                    func.earth_box(func.ll_to_earth(lat, lon), radius).op("@>")(
+                        func.ll_to_earth(
+                            getattr(schema_cls, "location_lat"),
+                            getattr(schema_cls, "location_long"),
+                        )
+                    )
+                )
             )
-            <= radius  # Distance in meters
+            .all()
         )
-        result = db.execute(stmt)
         if result:
             return [cls.model_validate(r, from_attributes=True) for r in result]
         if error_not_exist:

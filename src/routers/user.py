@@ -64,9 +64,7 @@ async def post_create_rating(
     cockroach_client: CockroachDBClient = Depends(),
 ):
     if user_id == verified_user.requesting_user.id:
-        raise HTTPException(
-            status_code=400, detail="User cannot rate themselves"
-        )
+        raise HTTPException(status_code=400, detail="User cannot rate themselves")
     UserService.create_rating(
         user_from=verified_user.requesting_user,
         user_to_id=user_id,
