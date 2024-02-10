@@ -116,9 +116,7 @@ class EmployerService:
                     description=request.description,
                     location_lat=request.location_lat,
                     location_long=request.location_long,
-                    done=None,
                     amount=request.amount,
-                    deleted=None,
                 )
             ],
         )
@@ -248,7 +246,7 @@ class EmployerService:
         cls, cockroach_client: CockroachDBClient, user: User, user_id: UUID
     ) -> list[PaymentResponse]:
         payments: list[Payment] | None = cockroach_client.query(
-            Payment.get_by_multiple_field_unique,
+            Payment.get_by_multiple_field_multiple,
             fields=["from_user_id", "to_user_id"],
             match_values=[user.id, user_id],
             error_not_exist=False,
