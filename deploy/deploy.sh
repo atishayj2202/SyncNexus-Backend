@@ -33,6 +33,7 @@ function check_version() {
 if [[ $1 = "migrate" ]]
 then
   docker run --rm \
+  --network host \
   --mount type=bind,source="$FLYWAY_CONFIG_PATH",target=/flyway/conf \
   --mount type=bind,source="$FLYWAY_MIGRATION_PATH",target=/flyway/sql \
   $FLYWAY_CONTAINER_NAME -configFiles=/flyway/conf/flyway.conf migrate
