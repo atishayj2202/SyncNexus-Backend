@@ -14,7 +14,8 @@ from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
 from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
-from src.utils.enums import UserType
+from src.utils.enums import EmployeeStatus, UserType
+from src.utils.time import get_current_time
 
 
 class EmployerService:
@@ -156,18 +157,72 @@ class EmployerService:
                     phone_no=user.phone_no,
                     title=temp[user.id][1],
                     status=temp[user.id][0],
+                    email=user.email,
                 )
             )
         return employee_response
 
     @classmethod
-    def search_employee(
+    def fetch_employee(
+        cls, cockroach_client: CockroachDBClient, user: User
+    ) -> EmployeeResponse:
+        employee_mapping: EmployeeMapping = cockroach_client.query(
+            EmployeeMapping.get_by_multiple_field_unique,
+            fields=["employee_id", "deleted"],
+            match_values=[user.id, None],
+            error_not_exist=False,
+        )
+        return EmployeeResponse(
+            employee_id=user.id,
+            name=user.name,
+            phone_no=user.phone_no,
+            title=employee_mapping.title,
+            status=employee_mapping.status,
+            email=user.email,
+        )
+
+    @classmethod
+    def search_employee_by_phone(
         cls, cockroach_client: CockroachDBClient, phone_no: str
     ) -> UserResponse:
         user: User = cockroach_client.query(
             User.get_by_field_unique,
             field="phone_no",
             match_value=phone_no,
+            error_not_exist=False,
+        )
+        if user is None or user.user_type == UserType.employer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not Found"
+            )
+        employee_mapping = cockroach_client.query(
+            EmployeeMapping.get_by_multiple_field_unique,
+            fields=["employee_id", "deleted"],
+            match_values=[user.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is not None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Employee is Employed",
+            )
+        return UserResponse(
+            id=user.id,
+            name=user.name,
+            email=user.email,
+            phone_no=user.phone_no,
+            user_type=user.user_type,
+            created_at=user.created_at,
+        )
+
+    @classmethod
+    def search_employee_by_email(
+        cls, cockroach_client: CockroachDBClient, email: str
+    ) -> UserResponse:
+        user: User = cockroach_client.query(
+            User.get_by_field_unique,
+            field="email",
+            match_value=email,
             error_not_exist=False,
         )
         if user is None or user.user_type == UserType.employer:
@@ -268,3 +323,29 @@ class EmployerService:
             )
             for payment in payments
         ]
+
+    @classmethod
+    def remove_employee(
+        cls,
+        cockroach_client: CockroachDBClient,
+        user_employee: User,
+        user_employer: User,
+    ):
+        employee_mapping = cockroach_client.query(
+            EmployeeMapping.get_by_multiple_field_unique,
+            fields=["employee_id", "employer_id", "deleted"],
+            match_values=[user_employee.id, user_employer.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Not Employed",
+            )
+        employee_mapping.deleted = get_current_time()
+        employee_mapping.status = EmployeeStatus.removed
+        cockroach_client.query(
+            EmployeeMapping.update_by_id,
+            id=employee_mapping.id,
+            new_data=employee_mapping,
+        )
