@@ -11,7 +11,7 @@ from src.client.cockroach import CockroachDBClient
 from src.responses.employee import EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
-from src.responses.user import PaymentRequest, UserResponse
+from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
 from src.services.employer import EmployerService
 
@@ -121,24 +121,23 @@ async def post_add_payment(
         )
     EmployerService.add_payment(
         user=verified_employee.employer,
+        employee_id=verified_employee.employee.id,
         request=request,
         cockroach_client=cockroach_client,
     )
-
-
-@employer_router.get(ENDPOINT_GET_EMPLOYEE_PAYMENT)
-async def post_get_employee_payment(
-    cockroach_client: CockroachDBClient = Depends(),
-    verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
-):
-    if verified_employee.employer is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You are not authorized to add payment to this employee",
-        )
-    EmployerService.fetch_employee_payments(
-        cockroach_client=cockroach_client,
-        user=verified_employee.employer,
-        user_id=verified_employee.employee.id,
-    )
     return Response(status_code=status.HTTP_200_OK)
+
+
+@employer_router.get(
+    ENDPOINT_GET_EMPLOYEE_PAYMENT, response_model=list[PaymentResponse]
+)
+async def post_get_employee_payment(
+    employee_id: UUID,
+    cockroach_client: CockroachDBClient = Depends(),
+    verified_user: VerifiedUser = Depends(user_auth.verify_employer),
+):
+    return EmployerService.fetch_employee_payments(
+        cockroach_client=cockroach_client,
+        user=verified_user.requesting_user,
+        user_id=employee_id,
+    )

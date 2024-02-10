@@ -166,7 +166,7 @@ class EmployerService:
     def search_employee(
         cls, cockroach_client: CockroachDBClient, phone_no: str
     ) -> UserResponse:
-        user : User = cockroach_client.query(
+        user: User = cockroach_client.query(
             User.get_by_field_unique,
             field="phone_no",
             match_value=phone_no,
@@ -224,7 +224,11 @@ class EmployerService:
 
     @classmethod
     def add_payment(
-        cls, user: User, request: PaymentRequest, cockroach_client: CockroachDBClient
+        cls,
+        user: User,
+        request: PaymentRequest,
+        cockroach_client: CockroachDBClient,
+        employee_id: UUID,
     ) -> None:
         cockroach_client.query(
             Payment.add,
@@ -232,7 +236,7 @@ class EmployerService:
                 Payment(
                     amount=request.amount,
                     from_user_id=user.id,
-                    to_user_id=request.to_user_id,
+                    to_user_id=employee_id,
                     currency=request.currency,
                     remarks=request.remarks,
                 )
