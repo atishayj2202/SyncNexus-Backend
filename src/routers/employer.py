@@ -17,17 +17,21 @@ from src.services.employer import EmployerService
 
 EMPLOYER_PREFIX = "/employer"
 employer_router = APIRouter(prefix=EMPLOYER_PREFIX)
-ENDPOINT_ADD_TASK = "/add-task/"  # done
-ENDPOINT_ADD_JOBS = "/add-jobs/"  # done
-ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done
-ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # pending
-ENDPOINT_GET_EMPLOYEE_LOCATION = "/{employee_id}/get-employee-location/"  # done
-ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/{title}"  # done
-ENDPOINT_SEARCH_EMPLOYEE_PHONE = "/{phone_no}/search-employee-phone/"  # done
-ENDPOINT_SEARCH_EMPLOYEE_EMAIL = "{email_id}/search-user-email/"  # pending
-ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # pending
-ENDPOINT_ADD_PAYMENT = "/{employee_id}/add-payment/"  # done
-ENDPOINT_GET_EMPLOYEE_PAYMENT = "/{employee_id}/get-payment/"  # done
+ENDPOINT_ADD_TASK = "/add-task/"  # done | integrated
+ENDPOINT_ADD_JOBS = "/add-jobs/"  # done | integrated
+ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done  | integrated
+ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # done
+ENDPOINT_GET_EMPLOYEE_LOCATION = (
+    "/{employee_id}/get-employee-location/"  # done | integrated
+)
+ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/{title}"  # done | integrated
+ENDPOINT_SEARCH_EMPLOYEE_PHONE = (
+    "/{phone_no}/search-employee-phone/"  # done | integrated
+)
+ENDPOINT_SEARCH_EMPLOYEE_EMAIL = "{email_id}/search-user-email/"  # done
+ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # done
+ENDPOINT_ADD_PAYMENT = "/{employee_id}/add-payment/"  # done | integrated
+ENDPOINT_GET_EMPLOYEE_PAYMENT = "/{employee_id}/get-payment/"  # done | integrated
 
 
 @employer_router.post(ENDPOINT_ADD_TASK)
@@ -90,8 +94,22 @@ async def get_search_employees(
     phone_no: str,
     cockroach_client: CockroachDBClient = Depends(),
 ):
-    return EmployerService.search_employee(
+    return EmployerService.search_employee_by_phone(
         cockroach_client=cockroach_client, phone_no=phone_no
+    )
+
+
+@employer_router.get(
+    ENDPOINT_SEARCH_EMPLOYEE_EMAIL,
+    response_model=UserResponse,
+    dependencies=[Depends(user_auth.verify_employer)],
+)
+async def get_search_employees_by_email(
+    email_id: str,
+    cockroach_client: CockroachDBClient = Depends(),
+):
+    return EmployerService.search_employee_by_email(
+        cockroach_client=cockroach_client, email=email_id
     )
 
 
@@ -140,4 +158,32 @@ async def post_get_employee_payment(
         cockroach_client=cockroach_client,
         user=verified_user.requesting_user,
         user_id=employee_id,
+    )
+
+
+@employer_router.get(ENDPOINT_REMOVE_EMPLOYEE)
+async def get_remove_employee(
+    cockroach_client: CockroachDBClient = Depends(),
+    verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
+):
+    if verified_employee.employer is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not authorized to add payment to this employee",
+        )
+    EmployerService.remove_employee(
+        cockroach_client=cockroach_client,
+        user_employee=verified_employee.employee,
+        user_employer=verified_employee.employer,
+    )
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@employer_router.get(ENDPOINT_GET_EMPLOYEE, response_model=EmployeeResponse)
+async def get_employee(
+    cockroach_client: CockroachDBClient = Depends(),
+    verified_employee: VerifiedEmployee = Depends(relation.verify_employee_s_employer),
+):
+    return EmployerService.fetch_employee(
+        cockroach_client=cockroach_client, user=verified_employee.employee
     )
