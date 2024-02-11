@@ -22,7 +22,7 @@ ENDPOINT_GET_JOB_DETAIL = "/{job_id}/get-job-detail/"  # done | integrated
 ENDPOINT_COMPLETE_TASK = "/{task_id}/complete-task/"  # done | integrated
 ENDPOINT_GET_EMPLOYER = "/get-employer/"  # done | integrated
 ENDPOINT_ADD_LOCATION = "/add-location/"  # done | integrated
-ENDPOINT_GET_JOBS = "/get-jobs/"  # done | integrated
+ENDPOINT_FIND_JOBS = "/find-jobs/"  # done | integrated
 ENDPOINT_LEAVE_JOB = "/leave-job/"  # done | integrated
 ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # done | integrated
 
@@ -80,7 +80,7 @@ async def post_add_location(
 
 
 @employee_router.post(
-    ENDPOINT_GET_JOBS,
+    ENDPOINT_FIND_JOBS,
     response_model=list[JobResponse],
     dependencies=[Depends(user_auth.verify_employee)],
 )
