@@ -172,6 +172,10 @@ class EmployerService:
             match_values=[user.id, None],
             error_not_exist=False,
         )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No Employee Found"
+            )
         return EmployeeResponse(
             employee_id=user.id,
             name=user.name,

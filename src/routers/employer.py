@@ -20,7 +20,7 @@ employer_router = APIRouter(prefix=EMPLOYER_PREFIX)
 ENDPOINT_ADD_TASK = "/add-task/"  # done | integrated
 ENDPOINT_ADD_JOBS = "/add-jobs/"  # done | integrated
 ENDPOINT_GET_EMPLOYEES = "/get-employees/"  # done  | integrated
-ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # done
+ENDPOINT_GET_EMPLOYEE = "/{employee_id}/get-employee/"  # done | integrated
 ENDPOINT_GET_EMPLOYEE_LOCATION = (
     "/{employee_id}/get-employee-location/"  # done | integrated
 )
@@ -28,8 +28,8 @@ ENDPOINT_ADD_EMPLOYEE = "/{employee_id}/add-employee/{title}"  # done | integrat
 ENDPOINT_SEARCH_EMPLOYEE_PHONE = (
     "/{phone_no}/search-employee-phone/"  # done | integrated
 )
-ENDPOINT_SEARCH_EMPLOYEE_EMAIL = "{email_id}/search-user-email/"  # done
-ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # done
+ENDPOINT_SEARCH_EMPLOYEE_EMAIL = "/{email_id}/search-employee-email/"  # done | integrated
+ENDPOINT_REMOVE_EMPLOYEE = "/{employee_id}/remove-employee/"  # done | integrated
 ENDPOINT_ADD_PAYMENT = "/{employee_id}/add-payment/"  # done | integrated
 ENDPOINT_GET_EMPLOYEE_PAYMENT = "/{employee_id}/get-payment/"  # done | integrated
 

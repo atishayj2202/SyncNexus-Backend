@@ -11,7 +11,7 @@ export REPOSITORY_NAME=google-solution-challenge-backend
 export FULL_IMAGE_NAME=asia-south2-docker.pkg.dev/${PROJECT_NAME}/${REPOSITORY_NAME}/${IMAGE_NAME}:${IMAGE_VERSION}
 export FLYWAY_CONTAINER_NAME=flyway/flyway:latest
 export FLYWAY_CONFIG_PATH="$PWD"/keys/conf
-export FLYWAY_MIGRATION_PATH="$PWD"/deploy/lexxa-flyway/migrations
+export FLYWAY_MIGRATION_PATH="$PWD"/deploy/flyway/migrations
 
 
 function build() {
@@ -50,6 +50,13 @@ then
 elif [[ $1 = "check-version" ]]
 then
   check_version
+elif [[ $1 = "make-secret" ]]
+then
+  mkdir -p "keys/conf"
+  echo "$(gcloud secrets versions access latest --secret="Service-Account-Credentials")" > keys/credentials.json
+  echo "flyway.url=$(gcloud secrets versions access latest --secret="DB_URL")$(gcloud secrets versions access latest --secret="DB_NAME")" >> keys/conf/flyway.conf
+  echo "flyway.user=$(gcloud secrets versions access latest --secret="DB_USER")" >> keys/conf/flyway.conf
+  echo "flyway.password=$(gcloud secrets versions access latest --secret="DB_PASS")" >> keys/conf/flyway.conf
 else
   echo "${usage}"
   exit 1
