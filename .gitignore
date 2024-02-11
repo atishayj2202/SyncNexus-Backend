@@ -155,3 +155,4 @@ keys/*
 /cockroach-data/
 .DS_Store
 cloud-sql-proxy
+deploy/flyway/flyway.toml
