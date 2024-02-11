@@ -70,9 +70,12 @@ elif [[ $1 = "pull-auth-proxy" ]]
 then
   curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.8.2/cloud-sql-proxy.darwin.arm64
   chmod +x cloud-sql-proxy
-elif [[ $1 = "remote-start" ]]
+elif [[ $1 = "remote-start-test" ]]
 then
   ./cloud-sql-proxy $GOOGLE_CLOUD_SQL_CONNECTION --credentials-file=$GOOGLE_CLOUD_SQL_CREDENTIALS_FILE --unix-socket="./keys/"
+elif [[ $1 = "remote-start-data" ]]
+then
+  ./cloud-sql-proxy $GOOGLE_CLOUD_SQL_CONNECTION --credentials-file=$GOOGLE_CLOUD_SQL_CREDENTIALS_FILE --port=3308
 else
   echo "${usage}"
   exit 1

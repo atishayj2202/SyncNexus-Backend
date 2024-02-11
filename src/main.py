@@ -11,7 +11,7 @@ from src.routers.employee import employee_router
 from src.routers.employer import employer_router
 from src.routers.user import user_router
 
-app = FastAPI(title="Google Solution Challenge Backend", version="0.2.0-dev1")
+app = FastAPI(title="Google Solution Challenge Backend", version="0.2.0-dev5")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
 

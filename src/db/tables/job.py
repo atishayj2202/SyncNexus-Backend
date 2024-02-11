@@ -11,7 +11,7 @@ class Jobs(DBSchemaBase):
     description: str | None
     location_lat: float
     location_long: float
-    done: datetime | None
+    done: datetime | None = None
     amount: int
     deleted: datetime | None = None
 

@@ -12,3 +12,4 @@ class EmployeeResponse(BaseModel):
     name: str
     phone_no: str
     status: EmployeeStatus
+    email: str

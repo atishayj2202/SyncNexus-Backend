@@ -12,6 +12,7 @@ from src.db.tables.task import Task
 from src.db.tables.user import User
 from src.responses.job import JobResponse
 from src.responses.task import TaskResponse
+from src.responses.user import UserResponse
 from src.responses.util import DurationRequest, Location
 from src.utils.enums import EmployeeStatus, TaskStatus
 from src.utils.time import get_current_time
@@ -189,4 +190,38 @@ class EmployeeService:
             Payment.update_by_id,
             id=payment.id,
             new_data=payment,
+        )
+
+    @classmethod
+    def fetch_employer(
+        cls, cockroach_client: CockroachDBClient, user: User
+    ) -> UserResponse:
+        employee_mapping: EmployeeMapping = cockroach_client.query(
+            EmployeeMapping.get_by_multiple_field_unique,
+            fields=["employee_id", "deleted"],
+            match_values=[user.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Not Employed",
+            )
+        employer: User = cockroach_client.query(
+            User.get_id,
+            id=employee_mapping.employer_id,
+            error_not_exist=False,
+        )
+        if employer is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Employer Not Found",
+            )
+        return UserResponse(
+            id=employer.id,
+            name=employer.name,
+            phone_no=employer.phone_no,
+            email=employer.email,
+            created_at=employer.created_at,
+            user_type=employer.user_type,
         )

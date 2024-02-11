@@ -36,7 +36,6 @@ class RatingResponse(BaseModel):
 
 class PaymentRequest(BaseModel):
     amount: int
-    to_user_id: UUID
     currency: str = "INR"
     remarks: str | None = None
 
