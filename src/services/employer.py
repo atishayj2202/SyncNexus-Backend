@@ -11,7 +11,7 @@ from src.db.tables.task import Task
 from src.db.tables.user import User
 from src.db.views.payment import PaymentDetails
 from src.responses.employee import EmployeeResponse
-from src.responses.job import JobCreateRequest
+from src.responses.job import JobCreateRequest, JobResponse
 from src.responses.task import TaskCreateRequest
 from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
@@ -366,3 +366,106 @@ class EmployerService:
             id=employee_mapping.id,
             new_data=employee_mapping,
         )
+
+    @classmethod
+    def delete_job(cls, job_id: UUID, cockroach_client: CockroachDBClient, user: User):
+        job: Jobs = cockroach_client.query(
+            Jobs.get_by_multiple_field_unique,
+            fields=["id", "employer_id", "deleted"],
+            match_values=[job_id, user.id, None],
+            error_not_exist=False,
+        )
+        if job is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not Found",
+            )
+        if job.done is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Job already completed",
+            )
+        job.deleted = get_current_time()
+        cockroach_client.query(
+            Jobs.update_by_id,
+            id=job.id,
+            new_data=job,
+        )
+
+    @classmethod
+    def complete_job(
+        cls, job_id: UUID, cockroach_client: CockroachDBClient, user: User
+    ):
+        job: Jobs = cockroach_client.query(
+            Jobs.get_by_multiple_field_unique,
+            fields=["id", "employer_id", "deleted"],
+            match_values=[job_id, user.id, None],
+            error_not_exist=False,
+        )
+        if job is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not Found",
+            )
+        if job.done is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Job already completed",
+            )
+        job.done = get_current_time()
+        cockroach_client.query(
+            Jobs.update_by_id,
+            id=job.id,
+            new_data=job,
+        )
+
+    @classmethod
+    def delete_task(cls, user: User, cockroach_client: CockroachDBClient, task: Task):
+        if user.id != task.employer_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
+        if task.deleted is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task already deleted",
+            )
+        if task.completed is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task already completed",
+            )
+        task.deleted = get_current_time()
+        cockroach_client.query(
+            Task.update_by_id,
+            id=task.id,
+            new_data=task,
+        )
+
+    @classmethod
+    def get_jobs(
+        cls, cockroach_client: CockroachDBClient, user: User
+    ) -> list[JobResponse]:
+        jobs: list[Jobs] = cockroach_client.query(
+            Jobs.get_by_field_multiple,
+            field="employer_id",
+            match_value=user.id,
+            error_not_exist=False,
+        )
+        return [
+            JobResponse(
+                id=job.id,
+                created_at=job.created_at,
+                employer_id=job.employer_id,
+                title=job.title,
+                description=job.description,
+                location=Location(
+                    location_lat=job.location_lat, location_long=job.location_long
+                ),
+                done=job.done,
+                amount=job.amount,
+                deleted=job.deleted,
+            )
+            for job in jobs
+        ]
