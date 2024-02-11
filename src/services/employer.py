@@ -9,6 +9,7 @@ from src.db.tables.job import Jobs
 from src.db.tables.payment import Payment
 from src.db.tables.task import Task
 from src.db.tables.user import User
+from src.db.views.payment import PaymentDetails
 from src.responses.employee import EmployeeResponse
 from src.responses.job import JobCreateRequest
 from src.responses.task import TaskCreateRequest
@@ -304,9 +305,9 @@ class EmployerService:
     def fetch_employee_payments(
         cls, cockroach_client: CockroachDBClient, user: User, user_id: UUID
     ) -> list[PaymentResponse]:
-        payments: list[Payment] | None = cockroach_client.query(
-            Payment.get_by_multiple_field_multiple,
-            fields=["from_user_id", "to_user_id"],
+        payments: list[PaymentDetails] | None = cockroach_client.query(
+            PaymentDetails.get_by_multiple_field_multiple,
+            fields=["sender_id", "receiver_id"],
             match_values=[user.id, user_id],
             error_not_exist=False,
         )
@@ -319,8 +320,20 @@ class EmployerService:
                 id=payment.id,
                 amount=payment.amount,
                 created_at=payment.created_at,
-                from_user_id=payment.from_user_id,
-                to_user_id=payment.to_user_id,
+                from_user=UserResponse(
+                    id=payment.sender_id,
+                    name=payment.sender_name,
+                    phone_no=payment.sender_phone,
+                    email=payment.sender_email,
+                    user_type=payment.sender_user_type,
+                ),
+                to_user=UserResponse(
+                    id=payment.receiver_id,
+                    name=payment.receiver_name,
+                    phone_no=payment.receiver_phone,
+                    email=payment.receiver_email,
+                    user_type=payment.receiver_user_type,
+                ),
                 currency=payment.currency,
                 remarks=payment.remarks,
                 approved_at=payment.approved_at,

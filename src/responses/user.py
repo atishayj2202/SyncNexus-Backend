@@ -11,7 +11,7 @@ class UserResponse(BaseModel):
     name: str
     phone_no: str
     email: str | None = None
-    created_at: datetime
+    created_at: datetime | None = None
     user_type: UserType
 
 
@@ -43,8 +43,8 @@ class PaymentRequest(BaseModel):
 class PaymentResponse(BaseModel):
     id: UUID
     amount: int
-    from_user_id: UUID
-    to_user_id: UUID
+    from_user: UserResponse
+    to_user: UserResponse
     currency: str = "INR"
     remarks: str | None = None
     created_at: datetime

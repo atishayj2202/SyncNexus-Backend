@@ -11,6 +11,7 @@ from src.db.tables.Feedback import Feedback
 from src.db.tables.payment import Payment
 from src.db.tables.ratings import Rating
 from src.db.tables.user import User
+from src.db.views.payment import PaymentDetails
 from src.db.views.rate import RatingView
 from src.responses.user import (
     PaymentResponse,
@@ -130,9 +131,9 @@ class UserService:
     def get_payments(
         cls, user: User, cockroach_client: CockroachDBClient, request: DurationRequest
     ) -> list[PaymentResponse]:
-        field = "to_user_id" if user.user_type == UserType.employee else "from_user_id"
-        payments: list[Payment] | None = cockroach_client.query(
-            Payment.get_by_time_field_multiple,
+        field = "receiver_id" if user.user_type == UserType.employee else "sender_id"
+        payments: list[PaymentDetails] | None = cockroach_client.query(
+            PaymentDetails.get_by_time_field_multiple,
             time_field="created_at",
             start_time=request.start_time,
             end_time=request.end_time,
@@ -149,8 +150,20 @@ class UserService:
                 id=payment.id,
                 amount=payment.amount,
                 created_at=payment.created_at,
-                from_user_id=payment.from_user_id,
-                to_user_id=payment.to_user_id,
+                from_user=UserResponse(
+                    id=payment.sender_id,
+                    name=payment.sender_name,
+                    phone_no=payment.sender_phone,
+                    email=payment.sender_email,
+                    user_type=payment.sender_user_type,
+                ),
+                to_user=UserResponse(
+                    id=payment.receiver_id,
+                    name=payment.receiver_name,
+                    phone_no=payment.receiver_phone,
+                    email=payment.receiver_email,
+                    user_type=payment.receiver_user_type,
+                ),
                 currency=payment.currency,
                 remarks=payment.remarks,
                 approved_at=payment.approved_at,
