@@ -137,6 +137,11 @@ class EmployeeService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Task Already Completed",
             )
+        if task.deleted is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task Already Deleted",
+            )
         task.completed = get_current_time()
         cockroach_client.query(
             Task.update_by_id,
