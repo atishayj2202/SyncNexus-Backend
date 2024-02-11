@@ -24,6 +24,7 @@ user_router = APIRouter(prefix=USER_PREFIX)
 ENDPOINT_CREATE_USER = "/create-user/"  # done | integrated
 ENDPOINT_CHECK_USER = "/check-user/"  # done | integrated
 ENDPOINT_GET_USER = "/get-user/"  # done | integrated
+ENDPOINT_FIND_USER_BY_ID = "/{user_id}/fetch-user-by-id/"  # done
 ENDPOINT_GET_USER_LOGS = "/{user_id}/get-user-logs/"  # deprecated
 ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done | integrated
 ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done | integrated
@@ -114,3 +115,15 @@ async def post_add_feedback(
         cockroach_client=cockroach_client,
     )
     return Response(status_code=status.HTTP_200_OK)
+
+
+@user_router.get(
+    ENDPOINT_FIND_USER_BY_ID,
+    response_model=UserResponse,
+    dependencies=[Depends(user_auth.verify_user)],
+)
+async def get_user_by_id(
+    user_id: UUID,
+    cockroach_client: CockroachDBClient = Depends(),
+):
+    return UserService.fetch_user_by_id(user_id, cockroach_client)

@@ -183,3 +183,16 @@ class UserService:
                 )
             ],
         )
+
+    @classmethod
+    def fetch_user_by_id(
+        cls, user_id: UUID, cockroach_client: CockroachDBClient
+    ) -> UserResponse:
+        user: User | None = cockroach_client.query(
+            User.get_id, id=user_id, error_not_exist=False
+        )
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+        return cls.fetch_user(user)
