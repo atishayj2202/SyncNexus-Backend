@@ -37,7 +37,7 @@ ENDPOINT_GET_EMPLOYEE_PAYMENT = "/{employee_id}/get-payment/"  # done | integrat
 ENDPOINT_GET_JOBS = "/get-jobs/"  # done | integrated
 ENDPOINT_DELETE_TASK = "/{task_id}/delete-task/"  # done | integrated
 ENDPOINT_DELETE_JOB = "/{job_id}/delete-job/"  # done | integrated
-ENDPOINT_COMPLETE_JOB = "/{job_id}/complete-job/"  # done
+ENDPOINT_COMPLETE_JOB = "/{job_id}/complete-job/"  # done | integrated
 
 
 @employer_router.post(ENDPOINT_ADD_TASK)
