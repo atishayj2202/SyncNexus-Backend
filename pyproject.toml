@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "google-solution-challenge"
-version = "0.2.0-dev8"
+version = "0.2.0-dev9"
 description = ""
 authors = ["ATISHAY JAIN <atishayj.frb@gmail.com>"]
 readme = "README.md"

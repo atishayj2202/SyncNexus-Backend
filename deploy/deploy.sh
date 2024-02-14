@@ -5,7 +5,7 @@ export PROJECT_NAME=winged-octagon-413211
 
 # docker details
 export IMAGE_NAME=google-solution-challenge-backend
-export IMAGE_VERSION=0.2.0-dev8
+export IMAGE_VERSION=0.2.0-dev9
 export SERVICE_NAME=google-solution-challenge-server
 export REPOSITORY_NAME=google-solution-challenge-backend
 export FULL_IMAGE_NAME=asia-south2-docker.pkg.dev/${PROJECT_NAME}/${REPOSITORY_NAME}/${IMAGE_NAME}:${IMAGE_VERSION}
