@@ -453,6 +453,11 @@ class EmployerService:
             match_value=user.id,
             error_not_exist=False,
         )
+        if jobs is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No Jobs Found",
+            )
         return [
             JobResponse(
                 id=job.id,
