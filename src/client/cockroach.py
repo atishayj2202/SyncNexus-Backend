@@ -21,9 +21,7 @@ class CockroachDBClient:
                 password=self.db_pass,
                 database=self.db_name,
                 query={"unix_sock": f"{self.unix_socket_path}/.s.PGSQL.5432"},
-            ),
-            max_overflow=20,
-            pool_size=5,
+            )
         )
 
     def get_session_maker(self):

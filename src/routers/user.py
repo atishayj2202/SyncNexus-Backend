@@ -18,6 +18,7 @@ from src.responses.user import (
 )
 from src.responses.util import DurationRequest
 from src.services.user import UserService
+from src.utils.client import getCockroachClient, getFirebaseClient
 
 USER_PREFIX = "/user"
 user_router = APIRouter(prefix=USER_PREFIX)
@@ -35,8 +36,8 @@ ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done | integrated
 @user_router.post(ENDPOINT_CREATE_USER)
 async def post_create_user(
     request: UserCreateRequest,
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ):
     UserService.create_user(request, cockroach_client, firebase_client)
     return Response(status_code=status.HTTP_200_OK)
@@ -62,7 +63,7 @@ async def post_create_rating(
     user_id: UUID,
     request: RatingRequest,
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
-    cockroach_client: CockroachDBClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     if user_id == verified_user.requesting_user.id:
         raise HTTPException(status_code=400, detail="User cannot rate themselves")
@@ -82,7 +83,7 @@ async def post_create_rating(
 )
 async def get_rating(
     user_id: UUID,
-    cockroach_client: CockroachDBClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     return UserService.fetch_rating(user_id=user_id, cockroach_client=cockroach_client)
 
@@ -93,7 +94,7 @@ async def get_rating(
 )
 async def get_payments(
     request: DurationRequest,
-    cockroach_client: CockroachDBClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
     return UserService.get_payments(
@@ -106,7 +107,7 @@ async def get_payments(
 @user_router.post(ENDPOINT_ADD_FEEDBACK)
 async def post_add_feedback(
     request: RatingRequest,
-    cockroach_client: CockroachDBClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
     verified_user: VerifiedUser = Depends(user_auth.verify_user),
 ):
     UserService.add_feedback(
@@ -124,6 +125,6 @@ async def post_add_feedback(
 )
 async def get_user_by_id(
     user_id: UUID,
-    cockroach_client: CockroachDBClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     return UserService.fetch_user_by_id(user_id, cockroach_client)

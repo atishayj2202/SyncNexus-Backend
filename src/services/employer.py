@@ -137,10 +137,15 @@ class EmployerService:
         if employees is None:
             return []
         for i in employees:
-            if i.deleted is not None:
-                temp[i.employee_id] = [i.status, i.title]
-            else:
-                temp[i.employee_id] = [i.status, i.title]
+            if (
+                temp.get(i.employee_id) is None
+                or i.deleted is None
+                or (
+                    temp.get(i.employee_id) is not None
+                    and temp[i.employee_id][2] < i.deleted
+                )
+            ):
+                temp[i.employee_id] = [i.status, i.title, i.deleted]
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",

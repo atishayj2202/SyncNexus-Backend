@@ -44,16 +44,19 @@ class EmployeeService:
         cockroach_client: CockroachDBClient,
         request: DurationRequest,
     ) -> list[TaskResponse]:
-        tasks: list[Task] = cockroach_client.query(
-            Task.get_by_field_multiple,
+        tasks: list[Task] | None = cockroach_client.query(
+            Task.get_by_time_field_multiple,
+            time_field="last_date",
+            start_time=request.start_time,
+            end_time=request.end_time,
             field="employee_id",
             match_value=employee.id,
             error_not_exist=False,
         )
         response_list = []
+        if tasks is None:
+            return response_list
         for task in tasks:
-            if request.start_time < task.last_date < request.end_time:
-                continue
             response_list.append(cls.fetch_task(task))
         return response_list
 
