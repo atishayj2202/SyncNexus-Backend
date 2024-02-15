@@ -47,7 +47,7 @@ class EmployeeService:
     ) -> list[TaskResponse]:
         tasks: list[Task] | None = cockroach_client.query(
             Task.get_by_time_field_multiple,
-            time_field="last_date",
+            time_field="created_at",
             start_time=request.start_time,
             end_time=request.end_time,
             field="employee_id",
