@@ -8,6 +8,7 @@ from src.auth import relation, user_auth
 from src.auth.relation import VerifiedEmployee
 from src.auth.user_auth import VerifiedTask, VerifiedUser
 from src.client.cockroach import CockroachDBClient
+from src.responses.employee import EmployeeResponse
 from src.responses.job import JobResponse
 from src.responses.task import TaskResponse
 from src.responses.user import UserResponse
@@ -26,6 +27,7 @@ ENDPOINT_ADD_LOCATION = "/add-location/"  # done | integrated
 ENDPOINT_FIND_JOBS = "/find-jobs/"  # done | integrated
 ENDPOINT_LEAVE_JOB = "/leave-job/"  # done | integrated
 ENDPOINT_APPROVE_PAYMENT = "/{payment_id}/approve-payment/"  # done | integrated
+ENDPOINT_GET_EMPLOYEE_JOB = "/get-employee-job/"  # done
 
 
 @employee_router.post(ENDPOINT_GET_TASKS, response_model=list[TaskResponse])
@@ -124,5 +126,15 @@ async def get_employer(
     cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     return EmployeeService.fetch_employer(
+        cockroach_client=cockroach_client, user=verified_user.requesting_user
+    )
+
+
+@employee_router.get(ENDPOINT_GET_EMPLOYEE_JOB, response_model=EmployeeResponse)
+async def get_employee_job(
+    verified_user: VerifiedUser = Depends(user_auth.verify_employee),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    return EmployeeService.fetch_employee_job(
         cockroach_client=cockroach_client, user=verified_user.requesting_user
     )

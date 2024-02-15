@@ -145,7 +145,7 @@ class EmployerService:
                     and temp[i.employee_id][2] < i.deleted
                 )
             ):
-                temp[i.employee_id] = [i.status, i.title, i.deleted]
+                temp[i.employee_id] = [i.status, i.title, i.deleted, i.created_at]
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",
@@ -163,6 +163,7 @@ class EmployerService:
                     phone_no=user.phone_no,
                     title=temp[user.id][1],
                     status=temp[user.id][0],
+                    join_date=temp[user.id][3],
                     email=user.email,
                 )
             )
@@ -188,6 +189,7 @@ class EmployerService:
             phone_no=user.phone_no,
             title=employee_mapping.title,
             status=employee_mapping.status,
+            join_date=employee_mapping.created_at,
             email=user.email,
         )
 

@@ -10,6 +10,7 @@ from src.db.tables.job import Jobs
 from src.db.tables.payment import Payment
 from src.db.tables.task import Task
 from src.db.tables.user import User
+from src.responses.employee import EmployeeResponse
 from src.responses.job import JobResponse
 from src.responses.task import TaskResponse
 from src.responses.user import UserResponse
@@ -236,4 +237,29 @@ class EmployeeService:
             email=employer.email,
             created_at=employer.created_at,
             user_type=employer.user_type,
+        )
+
+    @classmethod
+    def fetch_employee_job(
+        cls, cockroach_client: CockroachDBClient, user: User
+    ) -> EmployeeResponse:
+        employee_mapping: EmployeeMapping = cockroach_client.query(
+            EmployeeMapping.get_by_multiple_field_unique,
+            fields=["employee_id", "deleted"],
+            match_values=[user.id, None],
+            error_not_exist=False,
+        )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Not Employed",
+            )
+        return EmployeeResponse(
+            employee_id=user.id,
+            name=user.name,
+            phone_no=user.phone_no,
+            title=employee_mapping.title,
+            status=employee_mapping.status,
+            join_date=employee_mapping.created_at,
+            email=user.email,
         )
