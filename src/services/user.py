@@ -19,6 +19,7 @@ from src.responses.user import (
     RatingResponse,
     UserCreateRequest,
     UserResponse,
+    UserUpdateRequest,
 )
 from src.responses.util import DurationRequest
 from src.utils.enums import UserType
@@ -196,3 +197,40 @@ class UserService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
         return cls.fetch_user(user)
+
+    @classmethod
+    def update_user(
+        cls, user: User, request: UserUpdateRequest, cockroach_client: CockroachDBClient
+    ):
+        if request.email is not None and request.email != user.email:
+            temp = cockroach_client.query(
+                User.get_by_field_unique,
+                field="email",
+                match_value=request.email,
+                error_not_exist=False,
+            )
+            if temp is not None and temp.id != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT, detail="Email already exists"
+                )
+            user.email = request.email
+        if request.phone_no is not None and request.phone_no != user.phone_no:
+            temp = cockroach_client.query(
+                User.get_by_field_unique,
+                field="phone_no",
+                match_value=request.phone_no,
+                error_not_exist=False,
+            )
+            if temp is not None and temp.id != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Phone number already exists",
+                )
+            user.phone_no = request.phone_no
+        if request.name is not None and request.name != user.name:
+            user.name = request.name
+        cockroach_client.query(
+            User.update_by_id,
+            id=user.id,
+            new_data=user,
+        )

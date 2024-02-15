@@ -23,6 +23,12 @@ class UserCreateRequest(BaseModel):
     firebase_user_id: str
 
 
+class UserUpdateRequest(BaseModel):
+    email: str | None = None
+    phone_no: str | None = None
+    name: str | None = None
+
+
 class RatingRequest(BaseModel):
     rate: int
     comment: str | None = None

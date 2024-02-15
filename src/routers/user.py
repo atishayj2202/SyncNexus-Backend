@@ -15,6 +15,7 @@ from src.responses.user import (
     RatingResponse,
     UserCreateRequest,
     UserResponse,
+    UserUpdateRequest,
 )
 from src.responses.util import DurationRequest
 from src.services.user import UserService
@@ -31,6 +32,7 @@ ENDPOINT_ADD_RATING = "/{user_id}/add-rating/"  # done | integrated
 ENDPOINT_GET_RATING = "/{user_id}/get-rating/"  # done | integrated
 ENDPOINT_GET_PAYMENTS = "/get-payments/"  # done | integrated
 ENDPOINT_ADD_FEEDBACK = "/add-feedback/"  # done | integrated
+ENDPOINT_UPDATE_USER = "/update-user/"  # done | integrated
 
 
 @user_router.post(ENDPOINT_CREATE_USER)
@@ -128,3 +130,17 @@ async def get_user_by_id(
     cockroach_client: CockroachDBClient = Depends(getCockroachClient),
 ):
     return UserService.fetch_user_by_id(user_id, cockroach_client)
+
+
+@user_router.post(ENDPOINT_UPDATE_USER)
+async def post_update_user(
+    request: UserUpdateRequest,
+    verified_user: VerifiedUser = Depends(user_auth.verify_user),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+):
+    UserService.update_user(
+        user=verified_user.requesting_user,
+        request=request,
+        cockroach_client=cockroach_client,
+    )
+    return Response(status_code=status.HTTP_200_OK)
