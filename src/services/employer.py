@@ -9,8 +9,9 @@ from src.db.tables.job import Jobs
 from src.db.tables.payment import Payment
 from src.db.tables.task import Task
 from src.db.tables.user import User
+from src.db.views.payment import PaymentDetails
 from src.responses.employee import EmployeeResponse
-from src.responses.job import JobCreateRequest
+from src.responses.job import JobCreateRequest, JobResponse
 from src.responses.task import TaskCreateRequest
 from src.responses.user import PaymentRequest, PaymentResponse, UserResponse
 from src.responses.util import DurationRequest, Location
@@ -136,10 +137,15 @@ class EmployerService:
         if employees is None:
             return []
         for i in employees:
-            if i.deleted is not None:
-                temp[i.employee_id] = [i.status, i.title]
-            else:
-                temp[i.employee_id] = [i.status, i.title]
+            if (
+                temp.get(i.employee_id) is None
+                or i.deleted is None
+                or (
+                    temp.get(i.employee_id) is not None
+                    and temp[i.employee_id][2] < i.deleted
+                )
+            ):
+                temp[i.employee_id] = [i.status, i.title, i.deleted, i.created_at]
         users: list[User] = cockroach_client.query(
             User.get_by_field_value_list,
             field="id",
@@ -157,6 +163,7 @@ class EmployerService:
                     phone_no=user.phone_no,
                     title=temp[user.id][1],
                     status=temp[user.id][0],
+                    join_date=temp[user.id][3],
                     email=user.email,
                 )
             )
@@ -172,12 +179,17 @@ class EmployerService:
             match_values=[user.id, None],
             error_not_exist=False,
         )
+        if employee_mapping is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="No Employee Found"
+            )
         return EmployeeResponse(
             employee_id=user.id,
             name=user.name,
             phone_no=user.phone_no,
             title=employee_mapping.title,
             status=employee_mapping.status,
+            join_date=employee_mapping.created_at,
             email=user.email,
         )
 
@@ -300,9 +312,9 @@ class EmployerService:
     def fetch_employee_payments(
         cls, cockroach_client: CockroachDBClient, user: User, user_id: UUID
     ) -> list[PaymentResponse]:
-        payments: list[Payment] | None = cockroach_client.query(
-            Payment.get_by_multiple_field_multiple,
-            fields=["from_user_id", "to_user_id"],
+        payments: list[PaymentDetails] | None = cockroach_client.query(
+            PaymentDetails.get_by_multiple_field_multiple,
+            fields=["sender_id", "receiver_id"],
             match_values=[user.id, user_id],
             error_not_exist=False,
         )
@@ -315,8 +327,20 @@ class EmployerService:
                 id=payment.id,
                 amount=payment.amount,
                 created_at=payment.created_at,
-                from_user_id=payment.from_user_id,
-                to_user_id=payment.to_user_id,
+                from_user=UserResponse(
+                    id=payment.sender_id,
+                    name=payment.sender_name,
+                    phone_no=payment.sender_phone,
+                    email=payment.sender_email,
+                    user_type=payment.sender_user_type,
+                ),
+                to_user=UserResponse(
+                    id=payment.receiver_id,
+                    name=payment.receiver_name,
+                    phone_no=payment.receiver_phone,
+                    email=payment.receiver_email,
+                    user_type=payment.receiver_user_type,
+                ),
                 currency=payment.currency,
                 remarks=payment.remarks,
                 approved_at=payment.approved_at,
@@ -349,3 +373,111 @@ class EmployerService:
             id=employee_mapping.id,
             new_data=employee_mapping,
         )
+
+    @classmethod
+    def delete_job(cls, job_id: UUID, cockroach_client: CockroachDBClient, user: User):
+        job: Jobs = cockroach_client.query(
+            Jobs.get_by_multiple_field_unique,
+            fields=["id", "employer_id", "deleted"],
+            match_values=[job_id, user.id, None],
+            error_not_exist=False,
+        )
+        if job is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not Found",
+            )
+        if job.done is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Job already completed",
+            )
+        job.deleted = get_current_time()
+        cockroach_client.query(
+            Jobs.update_by_id,
+            id=job.id,
+            new_data=job,
+        )
+
+    @classmethod
+    def complete_job(
+        cls, job_id: UUID, cockroach_client: CockroachDBClient, user: User
+    ):
+        job: Jobs = cockroach_client.query(
+            Jobs.get_by_multiple_field_unique,
+            fields=["id", "employer_id", "deleted"],
+            match_values=[job_id, user.id, None],
+            error_not_exist=False,
+        )
+        if job is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Job not Found",
+            )
+        if job.done is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Job already completed",
+            )
+        job.done = get_current_time()
+        cockroach_client.query(
+            Jobs.update_by_id,
+            id=job.id,
+            new_data=job,
+        )
+
+    @classmethod
+    def delete_task(cls, user: User, cockroach_client: CockroachDBClient, task: Task):
+        if user.id != task.employer_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
+        if task.deleted is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task already deleted",
+            )
+        if task.completed is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Task already completed",
+            )
+        task.deleted = get_current_time()
+        cockroach_client.query(
+            Task.update_by_id,
+            id=task.id,
+            new_data=task,
+        )
+
+    @classmethod
+    def get_jobs(
+        cls, cockroach_client: CockroachDBClient, user: User
+    ) -> list[JobResponse]:
+        jobs: list[Jobs] = cockroach_client.query(
+            Jobs.get_by_field_multiple,
+            field="employer_id",
+            match_value=user.id,
+            error_not_exist=False,
+        )
+        if jobs is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No Jobs Found",
+            )
+        return [
+            JobResponse(
+                id=job.id,
+                created_at=job.created_at,
+                employer_id=job.employer_id,
+                title=job.title,
+                description=job.description,
+                location=Location(
+                    location_lat=job.location_lat, location_long=job.location_long
+                ),
+                done=job.done,
+                amount=job.amount,
+                deleted=job.deleted,
+            )
+            for job in jobs
+        ]

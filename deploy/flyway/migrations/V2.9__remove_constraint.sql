@@ -1,0 +1,1 @@
+ALTER TABLE task DROP CONSTRAINT "task_last_date_check";

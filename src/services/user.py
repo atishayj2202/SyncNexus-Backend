@@ -11,6 +11,7 @@ from src.db.tables.Feedback import Feedback
 from src.db.tables.payment import Payment
 from src.db.tables.ratings import Rating
 from src.db.tables.user import User
+from src.db.views.payment import PaymentDetails
 from src.db.views.rate import RatingView
 from src.responses.user import (
     PaymentResponse,
@@ -18,6 +19,7 @@ from src.responses.user import (
     RatingResponse,
     UserCreateRequest,
     UserResponse,
+    UserUpdateRequest,
 )
 from src.responses.util import DurationRequest
 from src.utils.enums import UserType
@@ -130,9 +132,9 @@ class UserService:
     def get_payments(
         cls, user: User, cockroach_client: CockroachDBClient, request: DurationRequest
     ) -> list[PaymentResponse]:
-        field = "to_user_id" if user.user_type == UserType.employee else "from_user_id"
-        payments: list[Payment] | None = cockroach_client.query(
-            Payment.get_by_time_field_multiple,
+        field = "receiver_id" if user.user_type == UserType.employee else "sender_id"
+        payments: list[PaymentDetails] | None = cockroach_client.query(
+            PaymentDetails.get_by_time_field_multiple,
             time_field="created_at",
             start_time=request.start_time,
             end_time=request.end_time,
@@ -149,8 +151,20 @@ class UserService:
                 id=payment.id,
                 amount=payment.amount,
                 created_at=payment.created_at,
-                from_user_id=payment.from_user_id,
-                to_user_id=payment.to_user_id,
+                from_user=UserResponse(
+                    id=payment.sender_id,
+                    name=payment.sender_name,
+                    phone_no=payment.sender_phone,
+                    email=payment.sender_email,
+                    user_type=payment.sender_user_type,
+                ),
+                to_user=UserResponse(
+                    id=payment.receiver_id,
+                    name=payment.receiver_name,
+                    phone_no=payment.receiver_phone,
+                    email=payment.receiver_email,
+                    user_type=payment.receiver_user_type,
+                ),
                 currency=payment.currency,
                 remarks=payment.remarks,
                 approved_at=payment.approved_at,
@@ -169,4 +183,54 @@ class UserService:
                     from_user_id=user.id, rating=request.rate, feedback=request.comment
                 )
             ],
+        )
+
+    @classmethod
+    def fetch_user_by_id(
+        cls, user_id: UUID, cockroach_client: CockroachDBClient
+    ) -> UserResponse:
+        user: User | None = cockroach_client.query(
+            User.get_id, id=user_id, error_not_exist=False
+        )
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+        return cls.fetch_user(user)
+
+    @classmethod
+    def update_user(
+        cls, user: User, request: UserUpdateRequest, cockroach_client: CockroachDBClient
+    ):
+        if request.email is not None and request.email != user.email:
+            temp = cockroach_client.query(
+                User.get_by_field_unique,
+                field="email",
+                match_value=request.email,
+                error_not_exist=False,
+            )
+            if temp is not None and temp.id != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT, detail="Email already exists"
+                )
+            user.email = request.email
+        if request.phone_no is not None and request.phone_no != user.phone_no:
+            temp = cockroach_client.query(
+                User.get_by_field_unique,
+                field="phone_no",
+                match_value=request.phone_no,
+                error_not_exist=False,
+            )
+            if temp is not None and temp.id != user.id:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Phone number already exists",
+                )
+            user.phone_no = request.phone_no
+        if request.name is not None and request.name != user.name:
+            user.name = request.name
+        cockroach_client.query(
+            User.update_by_id,
+            id=user.id,
+            new_data=user,
         )

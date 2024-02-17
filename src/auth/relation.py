@@ -9,6 +9,7 @@ from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.tables.employee_mapping import EmployeeMapping
 from src.db.tables.user import User
+from src.utils.client import getCockroachClient, getFirebaseClient
 from src.utils.enums import UserType
 
 
@@ -25,8 +26,8 @@ class VerifiedEmployer(BaseModel):
 def verify_employee_s_employer(
     employee_id: UUID,
     authorization: str = Header(...),
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ) -> VerifiedEmployee:
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
@@ -57,8 +58,8 @@ def verify_employee_s_employer(
 def verify_employer_s_employee(
     employer_id: UUID,
     authorization: str = Header(...),
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ) -> VerifiedEmployer:
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:

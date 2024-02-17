@@ -13,3 +13,4 @@ class EmployeeResponse(BaseModel):
     phone_no: str
     status: EmployeeStatus
     email: str
+    join_date: datetime

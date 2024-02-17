@@ -1,4 +1,4 @@
-# Google-Solution-Challenge
+# SyncNexus-Backend
 
 ## environment setup
 

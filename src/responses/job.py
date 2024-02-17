@@ -20,7 +20,6 @@ class JobResponse(BaseModel):
     employer_id: UUID
     title: str
     description: str | None = None
-    last_date: str | None = None
     location: Location
     done: datetime | None = None
     amount: int

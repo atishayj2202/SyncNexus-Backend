@@ -1,22 +1,18 @@
 import os
-import time
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette import status
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.responses import Response
 
 from src.routers.employee import employee_router
 from src.routers.employer import employer_router
 from src.routers.user import user_router
 
-app = FastAPI(title="Google Solution Challenge Backend", version="0.2.0-dev5")
+app = FastAPI(title="Google Solution Challenge Backend", version="0.2.0-dev12")
 
 origins = os.environ["CORS_ORIGINS"].split(",")
 
 
-class TimingMiddleware(BaseHTTPMiddleware):
+"""class TimingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
         start_time = time.time()
 
@@ -31,10 +27,10 @@ class TimingMiddleware(BaseHTTPMiddleware):
             f"Request {request.method} {request.url} processed in {process_time:.5f} seconds"
         )
 
-        return response
+        return response"""
 
 
-app.add_middleware(TimingMiddleware)
+"""app.add_middleware(TimingMiddleware)"""
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,7 +41,7 @@ app.add_middleware(
 )
 
 
-@app.middleware("http")
+"""@app.middleware("http")
 async def error_middleware(request: Request, call_next):
     try:
         return await call_next(request)
@@ -55,8 +51,7 @@ async def error_middleware(request: Request, call_next):
         return Response(
             content="Internal Server Error",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
+        )"""
 
 app.include_router(user_router)
 app.include_router(employee_router)

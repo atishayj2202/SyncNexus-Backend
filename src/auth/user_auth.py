@@ -9,6 +9,7 @@ from src.client.cockroach import CockroachDBClient
 from src.client.firebase import FirebaseClient
 from src.db.tables.task import Task
 from src.db.tables.user import User
+from src.utils.client import getCockroachClient, getFirebaseClient
 from src.utils.enums import UserType
 
 
@@ -23,8 +24,8 @@ class VerifiedTask(BaseModel):
 
 def verify_user(
     authorization: str = Header(...),
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ) -> VerifiedUser:
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
@@ -37,8 +38,8 @@ def verify_user(
 def verify_task(
     task_id: UUID,
     authorization: str = Header(...),
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ):
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
@@ -62,8 +63,8 @@ def verify_task(
 
 def verify_employer(
     authorization: str = Header(...),
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ) -> VerifiedUser:
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
@@ -79,15 +80,15 @@ def verify_employer(
 
 def verify_employee(
     authorization: str = Header(...),
-    cockroach_client: CockroachDBClient = Depends(),
-    firebase_client: FirebaseClient = Depends(),
+    cockroach_client: CockroachDBClient = Depends(getCockroachClient),
+    firebase_client: FirebaseClient = Depends(getFirebaseClient),
 ) -> VerifiedUser:
     user: User = _get_requesting_user(authorization, cockroach_client, firebase_client)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
-    if user.type != UserType.employee:
+    if user.user_type != UserType.employee:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
         )
