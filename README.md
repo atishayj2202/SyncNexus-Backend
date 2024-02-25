@@ -2,6 +2,22 @@
 
 Welcome to the SyncNexus backend repository for the Google Solution Challenge! This backend repository serves as the core infrastructure powering the SyncNexus platform, facilitating seamless communication between users, managing job listings, and handling various other functionalities.
 
+## Project Links
+
+This section contains links to the frontend and backend repositories, as well as the base URL and documentation for the backend API.
+
+### Frontend Repository
+- Repository URL: [Frontend Repo - https://github.com/Ahmedazim7804/SyncNexus-Frontend](https://github.com/Ahmedazim7804/SyncNexus-Frontend)
+
+### Backend Repository
+- Repository URL: [Backend Repo - https://github.com/atishayj2202/SyncNexus-Backend](https://github.com/atishayj2202/SyncNexus-Backend)
+
+### Backend API Endpoint Base URL
+- Base URL: https://google-solution-challenge-backend-jpnacpp5ta-em.a.run.app
+
+### Backend API Endpoint Documentation
+- Documentation URL: https://google-solution-challenge-backend-jpnacpp5ta-em.a.run.app/docs
+
 ## Technologies Used
 - **Programming Language**: Python
 - **Framework**: fastAPI
