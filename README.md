@@ -44,7 +44,7 @@ To set up the backend locally for development or testing purposes, follow these 
    - *DB_NAME*: Name of the database.
    - *DB_USER*: User of the database.
    - *DB_PASS*: Password of the above user.
-   - *UNIX_SOCKET_PATH*: Path of the Unix socket file. By default, it's "./keys/" + <connection string of the database>.
+   - *UNIX_SOCKET_PATH*: Path of the Unix socket file. By default, it's "./keys/" + `connection string of the database`.
    - *FIREBASE_API_KEY*: API key of Firebase.
    - *FIREBASE_SA_KEY_PATH*: Absolute path of the Firebase credentials file.
 7. **Run Backend Server**: Execute the src/main.py file to start the backend server.
