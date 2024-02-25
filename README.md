@@ -38,6 +38,9 @@ The backend project follows a standard fastAPI project structure with modular ap
 - **services**: Includes algorithms to handle queries in the database and return data. These services encapsulate business logic related to data manipulation.
 - **main.py**: This is the entry point of the application. It connects all routers to FastAPI, initializing the web server and defining routes.
 
+## Architecture
+![architecture.jpg](public%2Farchitecture.jpg)
+
 ## Setup Instructions
 To set up the backend locally for development or testing purposes, follow these steps:
 1. **Run Migrations**: Execute database migrations using the migration file located at `deploy/flyway/migrations` to ensure the database schema is up-to-date.
@@ -107,7 +110,7 @@ The option can be:
   - also add `--tag` to create a git tag when releasing
 
 ## Contributors
-Atishaya Jain\
-Ajeem Ahmed\
-Sidhhant Gudwani\
-Tanmay Gupta
+- Atishaya Jain
+- Ajeem Ahmed
+- Sidhhant Gudwani
+- Tanmay Gupta
