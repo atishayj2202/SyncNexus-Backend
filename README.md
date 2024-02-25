@@ -55,7 +55,7 @@ The backend is designed to be deployed on Google Cloud Platform (GCP) for scalab
 - Docker Daemon installed.
 - Access to a remote location to upload Docker images (e.g., Docker Hub, Google Artifact Registry).
 
-##### Build and Push Docker Image
+##### Build, Push & Deploy Docker Image
 1. Update credentials in the `deploy.sh` file.
 2. Run the following command to build and push the Docker image:
 ```shell
