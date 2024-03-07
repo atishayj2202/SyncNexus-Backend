@@ -1,22 +1,22 @@
-# SyncNexus Backend - Google Solution Challenge
+# Innohack Backend - Google Solution Challenge
 
-Welcome to the SyncNexus backend repository for the Google Solution Challenge! This backend repository serves as the core infrastructure powering the SyncNexus platform, facilitating seamless communication between users, managing job listings, and handling various other functionalities.
+Welcome to the Innohack backend repository for the Innohack Hackathon! This backend repository serves as the core infrastructure powering the Catalogify platform,offers a friendly interface, letting you access Catalogify's features easily on your phone. Search, manage tasks, and communicate effortlessly.
 
 ## Project Links
 
 This section contains links to the frontend and backend repositories, as well as the base URL and documentation for the backend API.
 
 ### Frontend Repository
-- Repository URL: [Frontend Repo - https://github.com/Ahmedazim7804/SyncNexus-Frontend](https://github.com/Ahmedazim7804/SyncNexus-Frontend)
+- Repository URL: [(https://github.com/Ahmedazim7804/InnoHack)](https://github.com/Ahmedazim7804/InnoHack)
 
 ### Backend Repository
-- Repository URL: [Backend Repo - https://github.com/atishayj2202/SyncNexus-Backend](https://github.com/atishayj2202/SyncNexus-Backend)
+- Repository URL: [(https://github.com/atishayj2202/SyncNexus-Backend)](https://github.com/atishayj2202/InnoHack-Hackathon-Backend)
 
 ### Backend API Endpoint Base URL
-- Base URL: https://google-solution-challenge-backend-jpnacpp5ta-em.a.run.app
+- Base URL: https://innohack-hackathon-server.yellowbush-cadc3844.centralindia.azurecontainerapps.io 
 
 ### Backend API Endpoint Documentation
-- Documentation URL: https://google-solution-challenge-backend-jpnacpp5ta-em.a.run.app/docs
+- Documentation URL: https://innohack-hackathon-server.yellowbush-cadc3844.centralindia.azurecontainerapps.io/docs
 
 ## Technologies Used
 - **Programming Language**: Python
@@ -39,7 +39,7 @@ The backend project follows a standard fastAPI project structure with modular ap
 - **main.py**: This is the entry point of the application. It connects all routers to FastAPI, initializing the web server and defining routes.
 
 ## Architecture
-![architecture.jpg](public%2Farchitecture.jpg)
+
 
 ## Setup Instructions
 To set up the backend locally for development or testing purposes, follow these steps:
@@ -112,5 +112,5 @@ The option can be:
 ## Contributors
 - Atishaya Jain
 - Ajeem Ahmed
-- Sidhhant Gudwani
-- Tanmay Gupta
+- Khushal Bhasin
+- Dimple Yadav
